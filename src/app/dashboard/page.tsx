@@ -8,11 +8,11 @@ import { ForecastTable } from "@/components/forecast-table"
 import { TrendingUp } from "lucide-react"
 import { useForecast } from "@/context/ForecastContext"
 
-interface ForecastData {
-  date: string
-  forecast: number
-  confidence: number
-}
+// interface ForecastData {
+//   date: string
+//   forecast: number
+//   confidence: number
+// }
 
 export default function DashboardPage() {
   const { forecastData } = useForecast()

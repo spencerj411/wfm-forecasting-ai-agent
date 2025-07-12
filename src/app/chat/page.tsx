@@ -1,65 +1,65 @@
 "use client"
 
-import { useState } from "react"
+// import { useState } from "react"
 import { MessageCircle } from "lucide-react"
 
-interface Message {
-  id: string
-  content: string
-  sender: "user" | "ai"
-  timestamp: Date
-}
+// interface Message {
+//   id: string
+//   content: string
+//   sender: "user" | "ai"
+//   timestamp: Date
+// }
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      content:
-        "Hello! I'm your AI forecasting assistant. I can help you understand your demand forecasts, analyze trends, and provide insights. What would you like to know?",
-      sender: "ai",
-      timestamp: new Date(),
-    },
-  ])
-  const [inputValue, setInputValue] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+//   const [messages, setMessages] = useState<Message[]>([
+//     {
+//       id: "1",
+//       content:
+//         "Hello! I'm your AI forecasting assistant. I can help you understand your demand forecasts, analyze trends, and provide insights. What would you like to know?",
+//       sender: "ai",
+//       timestamp: new Date(),
+//     },
+//   ])
+//   const [inputValue, setInputValue] = useState("")
+//   const [isLoading, setIsLoading] = useState(false)
 
-  const sampleQuestions = [
-    "What's the forecast for July 23rd?",
-    "Which day has the highest predicted sales?",
-    "How confident are the forecasts?",
-    "What trends do you see in the data?",
-  ]
+//   const sampleQuestions = [
+//     "What's the forecast for July 23rd?",
+//     "Which day has the highest predicted sales?",
+//     "How confident are the forecasts?",
+//     "What trends do you see in the data?",
+//   ]
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim()) return
+//   const handleSendMessage = async () => {
+//     if (!inputValue.trim()) return
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: inputValue,
-      sender: "user",
-      timestamp: new Date(),
-    }
+//     const userMessage: Message = {
+//       id: Date.now().toString(),
+//       content: inputValue,
+//       sender: "user",
+//       timestamp: new Date(),
+//     }
 
-    setMessages((prev) => [...prev, userMessage])
-    setInputValue("")
-    setIsLoading(true)
+//     setMessages((prev) => [...prev, userMessage])
+//     setInputValue("")
+//     setIsLoading(true)
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: `I understand you're asking about "${inputValue}". Based on your forecast data, I can provide detailed insights. This is a simulated response - the full AI integration is coming soon!`,
-        sender: "ai",
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, aiMessage])
-      setIsLoading(false)
-    }, 1500)
-  }
+//     // Simulate AI response
+//     setTimeout(() => {
+//       const aiMessage: Message = {
+//         id: (Date.now() + 1).toString(),
+//         content: `I understand you're asking about "${inputValue}". Based on your forecast data, I can provide detailed insights. This is a simulated response - the full AI integration is coming soon!`,
+//         sender: "ai",
+//         timestamp: new Date(),
+//       }
+//       setMessages((prev) => [...prev, aiMessage])
+//       setIsLoading(false)
+//     }, 1500)
+//   }
 
-  const handleSampleQuestion = (question: string) => {
-    setInputValue(question)
-  }
+//   const handleSampleQuestion = (question: string) => {
+//     setInputValue(question)
+//   }
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-40 pt-28 overflow-x-hidden">
