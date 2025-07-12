@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ForecastTable } from "@/components/forecast-table"
 import { TrendingUp } from "lucide-react"
+import { useForecast } from "@/context/ForecastContext"
 
 interface ForecastData {
   date: string
@@ -14,25 +15,16 @@ interface ForecastData {
 }
 
 export default function DashboardPage() {
-  const [forecastData, setForecastData] = useState<ForecastData[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { forecastData } = useForecast()
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    // Simulate loading forecast data
-    setTimeout(() => {
-      const mockData: ForecastData[] = [
-        { date: "2024-07-23", forecast: 1200, confidence: 50 },
-        { date: "2024-07-24", forecast: 1350, confidence: 75 },
-        { date: "2024-07-25", forecast: 1100, confidence: 60 },
-        { date: "2024-07-26", forecast: 1450, confidence: 80 },
-        { date: "2024-07-27", forecast: 1300, confidence: 65 },
-        { date: "2024-07-28", forecast: 1600, confidence: 90 },
-        { date: "2024-07-29", forecast: 1250, confidence: 55 },
-      ]
-      setForecastData(mockData)
-      setIsLoading(false)
-    }, 1000)
-  }, [])
+    if (forecastData.length > 0) {
+      setIsLoading(true)
+      const timer = setTimeout(() => setIsLoading(false), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [forecastData.length])
 
   if (isLoading) {
     return (

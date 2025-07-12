@@ -10,7 +10,7 @@ export default function HomePage() {
         <div className="max-w-4xl space-y-8 lg:space-y-12">
           <div className="space-y-6 lg:space-y-8 text-left">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-gray-900 leading-tight">
-              Welcome to the <span className="text-blue-600 opacity-90">Demand Forecasting</span> Agent
+              <span className="text-blue-600 opacity-90">Agentic AI </span> for Workforce Management Demand Forecasting
             </h1>
             <div className="max-w-2xl">
               <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 leading-relaxed font-light">

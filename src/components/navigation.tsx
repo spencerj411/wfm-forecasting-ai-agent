@@ -41,7 +41,7 @@ export function Navigation() {
             href="/"
             className="text-lg sm:text-xl font-semibold text-gray-900 tracking-tight hover:opacity-80 transition-opacity duration-300 truncate"
           >
-            Demand Forecasting
+            WFM Forecasting Agent
           </Link>
 
           {/* Desktop Navigation */}

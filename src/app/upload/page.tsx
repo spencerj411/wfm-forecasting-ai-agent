@@ -7,9 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FileUploader } from "@/components/file-uploader"
 import { toast } from "sonner"
 import { Download } from "lucide-react"
+import { useForecast } from "@/context/ForecastContext"
+
+interface ForecastData {
+    date: string
+    forecast: number
+    confidence: number
+  }
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null)
+  const { setForecastData } = useForecast()
   const [isProcessing, setIsProcessing] = useState(false)
   const router = useRouter()
 
@@ -58,6 +66,16 @@ export default function UploadPage() {
     // Simulate processing
     setTimeout(() => {
       toast.success('Forecast completed!')
+      const mockData: ForecastData[] = [
+        { date: "2024-07-23", forecast: 1200, confidence: 50 },
+        { date: "2024-07-24", forecast: 1350, confidence: 75 },
+        { date: "2024-07-25", forecast: 1100, confidence: 60 },
+        { date: "2024-07-26", forecast: 1450, confidence: 80 },
+        { date: "2024-07-27", forecast: 1300, confidence: 65 },
+        { date: "2024-07-28", forecast: 1600, confidence: 90 },
+        { date: "2024-07-29", forecast: 1250, confidence: 55 },
+      ]
+      setForecastData(mockData)
       setIsProcessing(false)
       router.push("/dashboard")
     }, 3000)
