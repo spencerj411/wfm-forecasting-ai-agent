@@ -31,34 +31,36 @@ export function FileUploader({ onFileSelect }: FileUploaderProps) {
     <div
       {...getRootProps()}
       className={cn(
-        "cursor-pointer card-rounded border-3 border-dashed border-gray-200 p-12 sm:p-16 lg:p-20 text-center transition-all duration-500 hover:border-blue-500 hover:bg-blue-50/20 bounce-hover backdrop-blur-sm",
-        isDragActive && "border-blue-500 bg-blue-50/30 scale-105",
+        "cursor-pointer rounded-lg border-2 border-dashed border-gray-200 p-8 sm:p-12 lg:p-16 text-center transition-all duration-500 hover:border-blue-400 hover:bg-blue-50/20 hover:scale-105 backdrop-blur-sm",
+        isDragActive && "border-blue-400 bg-blue-50/30 scale-105",
       )}
     >
       <input {...getInputProps()} />
-      <div className="space-y-6 sm:space-y-8">
+      <div className="space-y-4 sm:space-y-6">
         {acceptedFiles.length > 0 ? (
-          <div className="space-y-4 sm:space-y-6 animate-bounce-in">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto bg-green-600/10 rounded-full flex items-center justify-center">
-              <Upload className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-green-600" strokeWidth={1.5} />
-            </div>
+          <div className="space-y-3 sm:space-y-4">
+            <Upload
+              className="mx-auto h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-blue-600 opacity-70"
+              strokeWidth={1}
+            />
             <div
-              className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight truncate px-4"
+              className="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 tracking-tight truncate px-4"
               title={acceptedFiles[0].name}
             >
               {acceptedFiles[0].name}
             </div>
-            <p className="text-gray-600 text-lg sm:text-xl">Click to replace or drag a new file</p>
+            <p className="text-gray-600 text-base sm:text-lg">Click to replace or drag a new file</p>
           </div>
         ) : (
-          <div className="space-y-4 sm:space-y-6">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto bg-gray-500/10 rounded-full flex items-center justify-center">
-              <Upload className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-gray-500" strokeWidth={1.5} />
-            </div>
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">
+          <div className="space-y-3 sm:space-y-4">
+            <Upload
+              className="mx-auto h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-blue-600 opacity-70"
+              strokeWidth={1}
+            />
+            <div className="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 tracking-tight">
               {isDragActive ? "Drop your CSV file here" : "Click to upload or drag and drop"}
             </div>
-            <p className="text-gray-600 text-lg sm:text-xl">CSV files only • Maximum 10MB</p>
+            <p className="text-gray-600 text-base sm:text-lg">CSV files only • Maximum 10MB</p>
           </div>
         )}
       </div>
