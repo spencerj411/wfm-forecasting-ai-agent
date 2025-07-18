@@ -1,9 +1,9 @@
 import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
-import { Navigation } from "@/components/navigation"
+import { Navigation } from "../components/navigation"
 import { Toaster } from "@/components/ui/sonner"
-import { ForecastProvider } from "@/context/ForecastContext"
+import { ForecastProvider } from "../context/ForecastContext"
 
 export const metadata: Metadata = {
   title: "WFM Forecasting Agent",

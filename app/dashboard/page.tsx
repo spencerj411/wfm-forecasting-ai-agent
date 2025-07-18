@@ -4,9 +4,9 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ForecastTable } from "@/components/forecast-table"
+import { ForecastTable } from "../../components/forecast-table"
 import { TrendingUp, MessageCircle } from "lucide-react"
-import { useForecast } from "@/context/ForecastContext"
+import { useForecast } from "../../context/ForecastContext"
 
 export default function DashboardPage() {
   const { forecastData } = useForecast()
