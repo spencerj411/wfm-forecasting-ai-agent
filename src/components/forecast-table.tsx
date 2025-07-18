@@ -56,37 +56,42 @@ export function ForecastTable({ data }: ForecastTableProps) {
     return sortDirection === "asc" ? " ↑" : " ↓"
   }
 
+  const isHighForecast = (forecast: number) => {
+    const avgForecast = data.reduce((sum, item) => sum + item.forecast, 0) / data.length
+    return forecast > avgForecast
+  }
+
   return (
     <div className="overflow-x-hidden">
       {/* Desktop Table */}
       <div className="hidden md:block">
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-lg mx-6 sm:mx-8 lg:mx-12 mb-6 sm:mb-8 lg:mb-12">
+        <div className="bg-white card-rounded border border-gray-100 overflow-hidden shadow-xl mx-8 sm:mx-12 lg:mx-16 mb-8 sm:mb-12 lg:mb-16">
           <Table>
             <TableHeader>
-              <TableRow className="border-gray-100 bg-gray-50/30">
-                <TableHead className="font-semibold text-gray-900 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-10 text-sm sm:text-base">
+              <TableRow className="border-gray-100 bg-gray-50/50">
+                <TableHead className="font-bold text-gray-900 py-6 sm:py-8 lg:py-10 px-6 sm:px-8 lg:px-12 text-base sm:text-lg">
                   <Button
                     variant="ghost"
                     onClick={() => handleSort("date")}
-                    className="h-auto p-0 font-semibold text-gray-900 hover:bg-transparent hover:opacity-70 transition-opacity duration-300 text-sm sm:text-base"
+                    className="h-auto p-0 font-bold text-gray-900 hover:bg-transparent hover:opacity-70 transition-all duration-500 text-base sm:text-lg"
                   >
                     Date{getSortIndicator("date")}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-gray-900 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-10 text-sm sm:text-base">
+                <TableHead className="font-bold text-gray-900 py-6 sm:py-8 lg:py-10 px-6 sm:px-8 lg:px-12 text-base sm:text-lg">
                   <Button
                     variant="ghost"
                     onClick={() => handleSort("forecast")}
-                    className="h-auto p-0 font-semibold text-gray-900 hover:bg-transparent hover:opacity-70 transition-opacity duration-300 text-sm sm:text-base"
+                    className="h-auto p-0 font-bold text-gray-900 hover:bg-transparent hover:opacity-70 transition-all duration-500 text-base sm:text-lg"
                   >
                     Forecast Sales{getSortIndicator("forecast")}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-gray-900 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-10 text-sm sm:text-base">
+                <TableHead className="font-bold text-gray-900 py-6 sm:py-8 lg:py-10 px-6 sm:px-8 lg:px-12 text-base sm:text-lg">
                   <Button
                     variant="ghost"
                     onClick={() => handleSort("confidence")}
-                    className="h-auto p-0 font-semibold text-gray-900 hover:bg-transparent hover:opacity-70 transition-opacity duration-300 text-sm sm:text-base"
+                    className="h-auto p-0 font-bold text-gray-900 hover:bg-transparent hover:opacity-70 transition-all duration-500 text-base sm:text-lg"
                   >
                     Confidence Level{getSortIndicator("confidence")}
                   </Button>
@@ -97,30 +102,40 @@ export function ForecastTable({ data }: ForecastTableProps) {
               {sortedData.map((row, index) => (
                 <TableRow
                   key={index}
-                  className={`border-gray-100 hover:bg-blue-50/30 transition-colors duration-300 group ${
-                    index % 2 === 0 ? "bg-white" : "bg-gray-50/20"
-                  }`}
+                  className={`border-gray-100 hover:bg-blue-50/20 transition-colors duration-300 group ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                  } ${isHighForecast(row.forecast) ? "forecast-high" : ""}`}
                 >
-                  <TableCell className="font-medium text-gray-900 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-10 text-sm sm:text-base">
+                  <TableCell className="font-semibold text-gray-900 py-6 sm:py-8 lg:py-10 px-6 sm:px-8 lg:px-12 text-base sm:text-lg">
                     <span className="block sm:hidden" title={formatDate(row.date).full}>
                       {formatDate(row.date).short}
                     </span>
                     <span className="hidden sm:block">{formatDate(row.date).full}</span>
                   </TableCell>
-                  <TableCell className="text-gray-900 py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-10 font-semibold text-sm sm:text-base">
+                  <TableCell className="text-gray-900 py-6 sm:py-8 lg:py-10 px-6 sm:px-8 lg:px-12 font-bold text-base sm:text-lg">
                     <span className="truncate block" title={`$${row.forecast.toLocaleString()} ± $${row.confidence}`}>
                       ${row.forecast.toLocaleString()} ± ${row.confidence}
                     </span>
                   </TableCell>
-                  <TableCell className="py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-10">
-                    <div className="flex items-center space-x-3 sm:space-x-4 lg:space-x-6">
-                      <div className="flex-1 bg-gray-100 rounded-full h-2 sm:h-3 max-w-16 sm:max-w-24 lg:max-w-32">
+                  <TableCell className="py-6 sm:py-8 lg:py-10 px-6 sm:px-8 lg:px-12">
+                    <div className="flex items-center space-x-4 sm:space-x-6 lg:space-x-8">
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 sm:h-4 max-w-20 sm:max-w-28 lg:max-w-36">
                         <div
-                          className="bg-blue-600 bg-opacity-90 h-2 sm:h-3 rounded-full transition-all duration-700 group-hover:bg-opacity-100"
+                          className={`h-3 sm:h-4 rounded-full transition-all duration-300 ${
+                            row.confidence >= 70 ? "bg-green-600" : row.confidence >= 50 ? "bg-blue-600" : "bg-gray-400"
+                          }`}
                           style={{ width: `${row.confidence}%` }}
                         ></div>
                       </div>
-                      <span className="text-xs sm:text-sm lg:text-base font-semibold text-gray-600 min-w-[2.5rem] sm:min-w-[3rem] lg:min-w-[4rem]">
+                      <span
+                        className={`text-sm sm:text-base lg:text-lg font-bold min-w-[3rem] sm:min-w-[4rem] lg:min-w-[5rem] ${
+                          row.confidence >= 70
+                            ? "text-green-600"
+                            : row.confidence >= 50
+                              ? "text-blue-600"
+                              : "text-gray-500"
+                        }`}
+                      >
                         {row.confidence}%
                       </span>
                     </div>
@@ -133,35 +148,47 @@ export function ForecastTable({ data }: ForecastTableProps) {
       </div>
 
       {/* Mobile Cards */}
-      <div className="md:hidden px-4 sm:px-6 pb-6 sm:pb-8">
-        <div className="space-y-4">
+      <div className="md:hidden px-6 sm:px-8 pb-8 sm:pb-12">
+        <div className="space-y-6">
           {sortedData.map((row, index) => (
             <div
               key={index}
-              className={`bg-white rounded-xl border border-gray-100 p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300 hover:bg-blue-50/20 ${
-                index % 2 === 0 ? "" : "bg-gray-50/30"
-              }`}
+              className={`bg-white card-rounded border border-gray-100 p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 ${
+                index % 2 === 0 ? "" : "bg-gray-50/50"
+              } ${isHighForecast(row.forecast) ? "forecast-high" : ""}`}
             >
-              <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-4 sm:space-y-6">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-gray-900 text-base sm:text-lg">{formatDate(row.date).short}</span>
-                  <span className="text-xs sm:text-sm text-gray-500">{formatDate(row.date).full}</span>
+                  <span className="font-bold text-gray-900 text-lg sm:text-xl">{formatDate(row.date).short}</span>
+                  <span className="text-sm sm:text-base text-gray-500">{formatDate(row.date).full}</span>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Forecast Sales</span>
-                    <span className="font-semibold text-gray-900 text-sm sm:text-base">
+                    <span className="text-base text-gray-600 font-semibold">Forecast Sales</span>
+                    <span className="font-bold text-gray-900 text-base sm:text-lg">
                       ${row.forecast.toLocaleString()} ± ${row.confidence}
                     </span>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Confidence</span>
-                      <span className="font-semibold text-gray-600 text-sm">{row.confidence}%</span>
+                      <span className="text-base text-gray-600 font-semibold">Confidence</span>
+                      <span
+                        className={`font-bold text-base ${
+                          row.confidence >= 70
+                            ? "text-green-600"
+                            : row.confidence >= 50
+                              ? "text-blue-600"
+                              : "text-gray-500"
+                        }`}
+                      >
+                        {row.confidence}%
+                      </span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div className="w-full bg-gray-100 rounded-full h-3">
                       <div
-                        className="bg-blue-600 bg-opacity-90 h-2 rounded-full transition-all duration-700"
+                        className={`h-3 rounded-full transition-all duration-300 ${
+                          row.confidence >= 70 ? "bg-green-600" : row.confidence >= 50 ? "bg-blue-600" : "bg-gray-400"
+                        }`}
                         style={{ width: `${row.confidence}%` }}
                       ></div>
                     </div>

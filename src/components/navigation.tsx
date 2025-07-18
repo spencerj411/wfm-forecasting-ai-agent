@@ -29,35 +29,42 @@ export function Navigation() {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500",
         isScrolled
-          ? "bg-white/95 backdrop-blur-md border-b border-gray-100/80 shadow-sm"
+          ? "bg-white/95 backdrop-blur-md border-b border-gray-100/80 shadow-lg"
           : "bg-white/90 backdrop-blur-sm border-b border-gray-100/50",
       )}
+      role="navigation"
+      aria-label="Main navigation"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 py-6 sm:py-8">
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="text-lg sm:text-xl font-semibold text-gray-900 tracking-tight hover:opacity-80 transition-opacity duration-300 truncate"
+            className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight hover:opacity-80 transition-all duration-500 truncate focus:outline-none focus:ring-2 focus:ring-blue-600/20 rounded-lg px-2 py-1"
+            aria-label="WFM Forecasting Agent - Home"
           >
             WFM Forecasting Agent
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8 lg:space-x-12">
+          <div className="hidden md:flex items-center space-x-12 lg:space-x-16" role="menubar">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
+                role="menuitem"
                 className={cn(
-                  "text-sm font-medium transition-all duration-300 hover:opacity-70 relative whitespace-nowrap",
-                  pathname === item.href ? "text-blue-600" : "text-gray-600",
+                  "text-base font-semibold transition-all duration-300 hover:opacity-70 relative whitespace-nowrap py-2 px-4 rounded-lg min-h-[44px] flex items-center focus:outline-none focus:ring-2 focus:ring-blue-600/20",
+                  pathname === item.href
+                    ? "text-blue-600 bg-blue-50/30"
+                    : "text-gray-600 hover:bg-gray-50/50 hover:text-blue-600",
                 )}
+                aria-current={pathname === item.href ? "page" : undefined}
               >
                 {item.label}
                 {pathname === item.href && (
-                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-blue-600 rounded-full" />
                 )}
               </Link>
             ))}
@@ -66,25 +73,29 @@ export function Navigation() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors duration-300"
+            className="md:hidden p-3 text-gray-600 hover:text-gray-900 transition-all duration-500 rounded-lg hover:bg-gray-50/50 min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-600/20"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
           >
-            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {isOpen ? <X className="h-6 w-6" strokeWidth={1.5} /> : <Menu className="h-6 w-6" strokeWidth={1.5} />}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden mt-4 pt-4 border-t border-gray-100">
+          <div className="md:hidden mt-6 pt-6 border-t border-gray-100 animate-fade-in" role="menu">
             <div className="flex flex-col space-y-4">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
+                  role="menuitem"
                   className={cn(
-                    "text-sm font-medium transition-all duration-300 hover:opacity-70 py-2",
-                    pathname === item.href ? "text-blue-600" : "text-gray-600",
+                    "text-base font-semibold transition-all duration-300 hover:opacity-70 py-3 px-4 rounded-lg min-h-[48px] flex items-center focus:outline-none focus:ring-2 focus:ring-blue-600/20",
+                    pathname === item.href ? "text-blue-600 bg-blue-50/30" : "text-gray-600 hover:bg-gray-50/50",
                   )}
+                  aria-current={pathname === item.href ? "page" : undefined}
                 >
                   {item.label}
                 </Link>
