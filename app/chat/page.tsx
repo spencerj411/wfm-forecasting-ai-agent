@@ -3,8 +3,8 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { MessageCircle, Send, Sparkles, Mic } from "lucide-react"
+import { Sparkles, ArrowUp } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface Message {
   id: string
@@ -26,7 +26,6 @@ export default function ChatPage() {
   const [inputValue, setInputValue] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const chatContainerRef = useRef<HTMLDivElement>(null)
 
   const sampleQuestions = [
     "What's the forecast for July 23rd?",
@@ -41,7 +40,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages])
+  }, [messages, isLoading])
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return
@@ -57,11 +56,10 @@ export default function ChatPage() {
     setInputValue("")
     setIsLoading(true)
 
-    // Simulate AI response
     setTimeout(() => {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: `I understand you're asking about "${inputValue}". Based on your forecast data, I can provide detailed insights. This is a simulated response - the full AI integration is coming soon!`,
+        content: `I understand you're asking about "${userMessage.content}". Based on your forecast data, I can provide detailed insights. This is a simulated response - the full AI integration is coming soon!`,
         sender: "ai",
         timestamp: new Date(),
       }
@@ -72,6 +70,7 @@ export default function ChatPage() {
 
   const handleSampleQuestion = (question: string) => {
     setInputValue(question)
+    document.getElementById("chat-input")?.focus()
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -86,155 +85,118 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-6 sm:px-8 lg:px-12 py-12 sm:py-16 lg:py-24 pt-32 overflow-x-hidden">
-      <div className="mb-8 sm:mb-12 lg:mb-16 space-y-4 sm:space-y-6 lg:space-y-8 text-left animate-fade-in">
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight">Chat Insights</h1>
-        <p className="text-xl sm:text-2xl lg:text-3xl text-gray-600 font-light max-w-4xl">
-          Ask natural language questions about your forecasts and get intelligent insights from our AI assistant.
-        </p>
-      </div>
-
-      <div className="space-y-6 sm:space-y-8">
-        {/* Sample Questions */}
-        <div className="animate-fade-in-delay-1">
-          <Card className="bg-blue-50/40 backdrop-blur-md border-0 card-rounded shadow-xl border border-blue-600/10">
-            <CardContent className="p-6 sm:p-8">
-              <div className="space-y-4 sm:space-y-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-600/10 rounded-full flex items-center justify-center">
-                    <Sparkles className="h-5 w-5 text-blue-600" strokeWidth={1.5} />
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Try asking:</h3>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  {sampleQuestions.map((question, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleSampleQuestion(question)}
-                      className="text-left p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-100 hover:border-blue-300 hover:bg-blue-50/50 transition-all duration-300 hover:scale-[1.02] min-h-[48px] focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
-                      aria-label={`Ask: ${question}`}
-                    >
-                      <p className="text-sm sm:text-base text-gray-700 font-medium">"{question}"</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+    <div className="flex flex-col h-svh bg-white">
+      {/* Header */}
+      <header className="px-6 sm:px-8 lg:px-12 py-4 border-b border-gray-100 pt-28 sm:pt-32">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">Chat Insights</h1>
+          <p className="text-lg text-gray-600 font-light mt-1">Your AI-powered forecasting assistant.</p>
         </div>
+      </header>
 
-        {/* Chat Messages Container */}
-        <div className="animate-fade-in">
-          <Card className="bg-white/90 backdrop-blur-md border-0 card-rounded shadow-xl overflow-hidden">
-            <CardContent className="p-0">
+      {/* Chat History */}
+      <div className="flex-1 overflow-y-auto p-6 sm:p-8 lg:px-12 space-y-4" role="log" aria-live="polite">
+        <div className="max-w-4xl mx-auto space-y-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={cn(
+                "flex items-end gap-2 animate-bubble-in",
+                message.sender === "user" ? "justify-end" : "justify-start",
+              )}
+            >
               <div
-                ref={chatContainerRef}
-                className="h-96 sm:h-[28rem] overflow-y-auto p-4 sm:p-6 space-y-4 scroll-smooth"
-                role="region"
-                aria-label="Chat conversation"
-                aria-live="polite"
-              >
-                {messages.map((message, index) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"} animate-fade-in`}
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <div
-                      className={`max-w-[85%] sm:max-w-[75%] lg:max-w-[65%] ${
-                        message.sender === "user"
-                          ? "bg-blue-600 text-white rounded-[20px] rounded-br-[8px]"
-                          : "bg-gray-100 text-gray-900 rounded-[20px] rounded-bl-[8px]"
-                      } px-4 py-3 shadow-sm relative group`}
-                      role="article"
-                      aria-label={`${message.sender === "user" ? "Your message" : "AI assistant message"}`}
-                    >
-                      {message.sender === "ai" && (
-                        <div className="flex items-center space-x-2 mb-2">
-                          <div className="w-5 h-5 bg-blue-600/10 rounded-full flex items-center justify-center">
-                            <MessageCircle className="h-3 w-3 text-blue-600" strokeWidth={1.5} />
-                          </div>
-                          <span className="text-xs font-semibold text-blue-600">AI Assistant</span>
-                        </div>
-                      )}
-                      <p className="text-sm sm:text-base leading-relaxed mb-1">{message.content}</p>
-                      <div
-                        className={`text-xs opacity-70 text-right ${
-                          message.sender === "user" ? "text-blue-100" : "text-gray-500"
-                        }`}
-                      >
-                        {formatTime(message.timestamp)}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Typing Indicator */}
-                {isLoading && (
-                  <div className="flex justify-start animate-fade-in">
-                    <div className="bg-gray-100 text-gray-900 rounded-[20px] rounded-bl-[8px] px-4 py-3 shadow-sm">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 bg-blue-600/10 rounded-full flex items-center justify-center">
-                          <MessageCircle className="h-3 w-3 text-blue-600" strokeWidth={1.5} />
-                        </div>
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                          <div
-                            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                            style={{ animationDelay: "0.1s" }}
-                          ></div>
-                          <div
-                            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                            style={{ animationDelay: "0.2s" }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                className={cn(
+                  "max-w-[80%] sm:max-w-[70%] p-3 px-4 shadow-sm transition-all",
+                  message.sender === "user"
+                    ? "bg-imessage-blue text-white rounded-3xl rounded-br-lg"
+                    : "bg-gray-100 text-gray-900 rounded-3xl rounded-bl-lg",
                 )}
-                <div ref={messagesEndRef} />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Input Area */}
-        <div className="animate-fade-in-delay-2 sticky bottom-4 sm:bottom-6">
-          <Card className="bg-white/95 backdrop-blur-md border-0 card-rounded shadow-xl">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-end space-x-3 sm:space-x-4">
-                <div className="flex-1 relative">
-                  <input
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Ask about your forecasts..."
-                    className="w-full p-4 pr-12 text-base border-2 border-gray-200 rounded-2xl focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20 transition-all duration-300 bg-white resize-none min-h-[48px]"
-                    aria-label="Type your message"
-                    disabled={isLoading}
-                  />
-                  <button
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-blue-600 transition-colors duration-200 rounded-full hover:bg-blue-50 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                    aria-label="Voice input"
-                    title="Voice input (coming soon)"
-                  >
-                    <Mic className="h-5 w-5" strokeWidth={1.5} />
-                  </button>
-                </div>
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!inputValue.trim() || isLoading}
-                  className="btn-gradient min-w-[48px] min-h-[48px] p-3 disabled:opacity-50 disabled:cursor-not-allowed border-0 rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-[1.02]"
-                  aria-label="Send message"
+                role="article"
+                aria-label={`${message.sender === "user" ? "Your message" : "AI assistant message"}`}
+              >
+                <p className="text-base leading-relaxed break-words">{message.content}</p>
+                <p
+                  className={cn(
+                    "text-xs mt-1 text-right transition-colors",
+                    message.sender === "user" ? "text-blue-100/70" : "text-gray-500/70",
+                  )}
                 >
-                  <Send className="h-5 w-5" strokeWidth={1.5} />
-                </Button>
+                  {formatTime(message.timestamp)}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          ))}
+
+          {isLoading && (
+            <div className="flex items-end gap-2 justify-start animate-bubble-in">
+              <div className="bg-gray-100 rounded-3xl rounded-bl-lg p-3 px-4 shadow-sm">
+                <div className="flex items-center justify-center space-x-1 h-5">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                  <div
+                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.1s" }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
       </div>
+
+      {/* Input Area */}
+      <footer className="px-6 sm:px-8 lg:px-12 py-4 bg-white/80 backdrop-blur-md border-t border-gray-100">
+        <div className="max-w-4xl mx-auto">
+          {/* Suggestions */}
+          <div className="mb-3 flex flex-wrap gap-2 justify-center items-center">
+            <Sparkles className="h-4 w-4 text-gray-500 flex-shrink-0" />
+            {sampleQuestions.map((question, index) => (
+              <button
+                key={index}
+                onClick={() => handleSampleQuestion(question)}
+                className="text-xs text-gray-600 font-medium bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1.5 transition-colors"
+              >
+                {question}
+              </button>
+            ))}
+          </div>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSendMessage()
+            }}
+            className="flex items-center bg-gray-100 rounded-full p-2"
+          >
+            <input
+              id="chat-input"
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask about your forecasts..."
+              className="w-full px-4 py-2 text-base border-none focus:ring-0 bg-transparent flex-1"
+              aria-label="Type your message"
+              disabled={isLoading}
+            />
+            <Button
+              type="submit"
+              disabled={!inputValue.trim() || isLoading}
+              variant="gradient"
+              size="icon"
+              className="rounded-full w-10 h-10 flex-shrink-0"
+              aria-label="Send message"
+            >
+              <ArrowUp className="h-5 w-5" />
+            </Button>
+          </form>
+        </div>
+      </footer>
     </div>
   )
 }

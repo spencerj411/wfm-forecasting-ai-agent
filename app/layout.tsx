@@ -8,6 +8,7 @@ import { ForecastProvider } from "../context/ForecastContext"
 export const metadata: Metadata = {
   title: "WFM Forecasting Agent",
   description: "Upload data to analyse forecasts and gain insights",
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -22,7 +23,7 @@ export default function RootLayout({
         <ForecastProvider>
           <main className="min-h-screen overflow-x-hidden">{children}</main>
         </ForecastProvider>
-        <Toaster richColors  />
+        <Toaster richColors />
       </body>
     </html>
   )

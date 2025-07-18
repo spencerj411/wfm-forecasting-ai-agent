@@ -102,7 +102,7 @@ export function ForecastTable({ data }: ForecastTableProps) {
               {sortedData.map((row, index) => (
                 <TableRow
                   key={index}
-                  className={`border-gray-100 hover:bg-blue-50/20 transition-colors duration-300 group ${
+                  className={`border-gray-100 transition-colors duration-300 group ${
                     index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
                   } ${isHighForecast(row.forecast) ? "forecast-high" : ""}`}
                 >
