@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { CheckCircle, AlertCircle, FileText } from "lucide-react"
 import { useForecast } from "../../context/ForecastContext"
 import { PageWrapper } from "@/components/page-wrapper"
+import { DatabaseService } from "@/lib/database"
 
 interface ForecastData {
   date: string
@@ -74,11 +75,18 @@ export default function UploadPage() {
 
     setIsProcessing(true)
 
-    // Simulate processing
-    setTimeout(() => {
-      toast.success("Forecast completed!", {
-        description: "Your demand forecast has been generated successfully.",
+    try {
+      // Read file content
+      const csvContent = await file.text()
+      
+      // Upload to database
+      const { rowCount } = await DatabaseService.uploadSalesData(file, csvContent)
+      
+      toast.success("Data uploaded successfully!", {
+        description: `${rowCount} records uploaded to database.`,
       })
+
+      // Use mock forecast data (this will be replaced with actual model output later)
       const mockData: ForecastData[] = [
         { date: "2024-07-23", forecast: 1200, confidence: 50 },
         { date: "2024-07-24", forecast: 1350, confidence: 75 },
@@ -88,10 +96,17 @@ export default function UploadPage() {
         { date: "2024-07-28", forecast: 1600, confidence: 90 },
         { date: "2024-07-29", forecast: 1250, confidence: 55 },
       ]
+      
       setForecastData(mockData)
       setIsProcessing(false)
       router.push("/dashboard")
-    }, 3000)
+    } catch (error) {
+      console.error('Upload error:', error)
+      toast.error("Upload failed", {
+        description: error instanceof Error ? error.message : "Failed to upload data to database.",
+      })
+      setIsProcessing(false)
+    }
   }
 
   const downloadSampleCSV = () => {
