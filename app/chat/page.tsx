@@ -5,6 +5,8 @@ import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Sparkles, ArrowUp } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/components/auth-provider"
 
 interface Message {
   id: string
@@ -14,6 +16,8 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -27,6 +31,22 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login")
+    }
+  }, [user, loading, router])
+
+  useEffect(() => {
+    if (messages.length > 1 || isLoading) {
+      scrollToBottom()
+    }
+  }, [messages, isLoading])
+
+  if (loading || !user) {
+    return null
+  }
+
   const sampleQuestions = [
     "What's the forecast for July 23rd?",
     "Which day has the highest predicted sales?",
@@ -37,10 +57,6 @@ export default function ChatPage() {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages, isLoading])
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return

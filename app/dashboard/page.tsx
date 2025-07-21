@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/components/auth-provider"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,18 +12,28 @@ import { useForecast } from "../../context/ForecastContext"
 import { PageWrapper } from "@/components/page-wrapper"
 
 export default function DashboardPage() {
-  const { forecastData } = useForecast()
-  const [isLoading, setIsLoading] = useState(false)
+  const { user, loading } = useAuth()
+  const router = useRouter()
+  const { forecastData, isLoading } = useForecast()
+  const [isInitialLoading, setIsInitialLoading] = useState(false)
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login")
+    }
+  }, [user, loading, router])
 
   useEffect(() => {
     if (forecastData.length > 0) {
-      setIsLoading(true)
-      const timer = setTimeout(() => setIsLoading(false), 1000)
+      setIsInitialLoading(true)
+      const timer = setTimeout(() => setIsInitialLoading(false), 1000)
       return () => clearTimeout(timer)
     }
   }, [forecastData.length])
 
-  if (isLoading) {
+  if (loading || !user) return null
+
+  if (isLoading || isInitialLoading) {
     return (
       <PageWrapper>
         <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 py-12 sm:py-16 lg:py-24 overflow-x-hidden bg-white">
@@ -88,7 +100,7 @@ export default function DashboardPage() {
           {/* Primary metric */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
             <div className="lg:col-span-8 animate-fade-in">
-              <Card className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-xl h-full">
+              <Card variant="static" className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-xl h-full">
                 <CardContent className="p-8 sm:p-12">
                   <div className="space-y-6">
                     <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">Total Forecast Revenue</p>
@@ -104,7 +116,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="lg:col-span-4 animate-fade-in-delay-1">
-              <Card className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-xl h-full">
+              <Card variant="static" className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-xl h-full">
                 <CardContent className="p-8 sm:p-12 h-full flex flex-col justify-center">
                   <div className="space-y-6">
                     <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">Avg. Confidence</p>
@@ -121,7 +133,7 @@ export default function DashboardPage() {
           {/* Supporting metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
             <div className="animate-fade-in">
-              <Card className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-xl">
+              <Card variant="static" className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-xl">
                 <CardContent className="p-8 sm:p-12">
                   <div className="space-y-6">
                     <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">Analysis Period</p>
@@ -150,7 +162,7 @@ export default function DashboardPage() {
 
         {/* Forecast Table */}
         <div className="animate-fade-in-delay-2 forecast-table-container">
-          <Card className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-2xl overflow-hidden">
+          <Card variant="static" className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-2xl overflow-hidden">
             <CardHeader className="p-8 sm:p-12 pb-6 sm:pb-8">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-6 sm:space-y-0 sm:space-x-6">
                 <div className="space-y-3 min-w-0 text-left">

@@ -1,9 +1,14 @@
+"use client"
+
 import Link from "next/link"
+import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import { PageWrapper } from "@/components/page-wrapper"
 import { FeaturesSection } from "@/components/features-section"
 
 export default function HomePage() {
+  const { user } = useAuth()
+
   return (
     <PageWrapper>
       <div className="relative overflow-x-hidden bg-white">
@@ -22,9 +27,9 @@ export default function HomePage() {
               </div>
             </div>
             <div className="pt-8 lg:pt-12">
-              <Link href="/upload">
+              <Link href={user ? "/home" : "/login"}>
                 <Button variant="gradient" size="xl">
-                  Get Started
+                  {user ? "Go to Home" : "Login"}
                 </Button>
               </Link>
             </div>

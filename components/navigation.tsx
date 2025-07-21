@@ -2,12 +2,59 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
-import { Menu, X } from "lucide-react"
+import { Menu, X, LogOut } from "lucide-react"
+import { useAuth } from "@/components/auth-provider"
+import { Button } from "./ui/button"
+import { User } from "@supabase/supabase-js"
+
+function UserAvatar({ user, onSignOut }: { user: User; onSignOut: () => void }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  const initials = user.email?.substring(0, 2).toUpperCase() || "U"
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-center h-10 w-10 rounded-full bg-blue-600 text-white text-lg font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        {initials}
+      </button>
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none py-2 animate-fade-in-fast">
+          <div className="px-4 py-2 border-b">
+            <p className="text-sm text-gray-500">Signed in as</p>
+            <p className="truncate text-sm font-medium text-gray-900">{user.email}</p>
+          </div>
+          <button
+            onClick={onSignOut}
+            className="flex w-full items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+          >
+            <LogOut className="mr-3 h-5 w-5" />
+            Sign Out
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export function Navigation() {
   const pathname = usePathname()
+  const { user, logout } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -19,12 +66,18 @@ export function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const navItems = [
-    { href: "/", label: "Home" },
-    { href: "/upload", label: "Upload" },
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/chat", label: "Chat" },
-  ]
+  const handleSignOut = async () => {
+    await logout()
+  }
+
+  const navItems = user
+    ? [
+        { href: "/home", label: "Home" },
+        { href: "/upload", label: "Upload" },
+        { href: "/dashboard", label: "Dashboard" },
+        { href: "/chat", label: "Agentic Chat" },
+      ]
+    : [{ href: "/", label: "Home" }]
 
   return (
     <nav
@@ -40,7 +93,7 @@ export function Navigation() {
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 py-5 sm:py-6">
         <div className="flex items-center justify-between">
           <Link
-            href="/"
+            href={user ? "/home" : "/"}
             className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight hover:opacity-80 transition-all duration-500 truncate focus:outline-none focus:ring-2 focus:ring-blue-600/20 rounded-lg px-2 py-2"
             aria-label="WFM Forecasting Agent - Home"
           >
@@ -68,6 +121,13 @@ export function Navigation() {
                 )}
               </Link>
             ))}
+            {user ? (
+              <UserAvatar user={user} onSignOut={handleSignOut} />
+            ) : (
+              <Link href="/login">
+                <Button variant="gradient">Login</Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -100,6 +160,26 @@ export function Navigation() {
                   {item.label}
                 </Link>
               ))}
+              <div className="pt-4">
+                {user ? (
+                  <button
+                    onClick={() => {
+                      handleSignOut()
+                      setIsOpen(false)
+                    }}
+                    className="flex w-full items-center px-4 py-3 text-lg font-semibold text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                  >
+                    <LogOut className="mr-3 h-6 w-6" />
+                    Sign Out
+                  </button>
+                ) : (
+                  <Link href="/login" onClick={() => setIsOpen(false)}>
+                    <Button variant="gradient" size="lg" className="w-full">
+                      Login
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         )}
