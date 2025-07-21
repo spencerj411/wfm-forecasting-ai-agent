@@ -9,6 +9,8 @@ import { toast } from "sonner"
 import { CheckCircle, AlertCircle, FileText } from "lucide-react"
 import { useForecast } from "../../context/ForecastContext"
 import { PageWrapper } from "@/components/page-wrapper"
+import { useEffect } from "react"
+import { useAuth } from "@/components/auth-provider"
 
 interface ForecastData {
   date: string
@@ -17,11 +19,21 @@ interface ForecastData {
 }
 
 export default function UploadPage() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login")
+    }
+  }, [user, loading, router])
+
+  if (loading || !user) return null
+
   const [file, setFile] = useState<File | null>(null)
-  const { setForecastData } = useForecast()
+  const { saveForecastToDatabase } = useForecast()
   const [isProcessing, setIsProcessing] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
-  const router = useRouter()
 
   const validateCSV = (file: File): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -74,12 +86,12 @@ export default function UploadPage() {
 
     setIsProcessing(true)
 
-    // Simulate processing
-    setTimeout(() => {
-      toast.success("Forecast completed!", {
-        description: "Your demand forecast has been generated successfully.",
-      })
-      const mockData: ForecastData[] = [
+    try {
+      // Simulate processing
+      await new Promise(resolve => setTimeout(resolve, 3000))
+      
+      // Generate mock forecast data
+      const mockData = [
         { date: "2024-07-23", forecast: 1200, confidence: 50 },
         { date: "2024-07-24", forecast: 1350, confidence: 75 },
         { date: "2024-07-25", forecast: 1100, confidence: 60 },
@@ -88,10 +100,23 @@ export default function UploadPage() {
         { date: "2024-07-28", forecast: 1600, confidence: 90 },
         { date: "2024-07-29", forecast: 1250, confidence: 55 },
       ]
-      setForecastData(mockData)
-      setIsProcessing(false)
+
+      // Save to database
+      await saveForecastToDatabase(mockData)
+      
+      toast.success("Forecast completed!", {
+        description: "Your demand forecast has been generated and saved successfully.",
+      })
+      
       router.push("/dashboard")
-    }, 3000)
+    } catch (error) {
+      console.error('Forecast processing failed:', error)
+      toast.error("Forecast processing failed", {
+        description: "Please try again or contact support if the problem persists.",
+      })
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   const downloadSampleCSV = () => {

@@ -5,6 +5,8 @@ import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Sparkles, ArrowUp } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/components/auth-provider"
 
 interface Message {
   id: string
@@ -14,6 +16,17 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login")
+    }
+  }, [user, loading, router])
+
+  if (loading || !user) return null
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",

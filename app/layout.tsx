@@ -1,14 +1,13 @@
 import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
-import { Navigation } from "../components/navigation"
-import { Toaster } from "@/components/ui/sonner"
-import { ForecastProvider } from "../context/ForecastContext"
+import { AuthProvider } from "@/components/auth-provider"
+import LayoutWithNav from "@/components/LayoutWithNav"
 
 export const metadata: Metadata = {
   title: "WFM Forecasting Agent",
   description: "Upload data to analyse forecasts and gain insights",
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -19,11 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-system antialiased bg-white text-gray-900 selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
-        <Navigation />
-        <ForecastProvider>
-          <main className="min-h-screen overflow-x-hidden">{children}</main>
-        </ForecastProvider>
-        <Toaster richColors />
+        <AuthProvider>
+          <LayoutWithNav>{children}</LayoutWithNav>
+        </AuthProvider>
       </body>
     </html>
   )

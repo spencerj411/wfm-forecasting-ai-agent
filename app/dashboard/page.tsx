@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/components/auth-provider"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,18 +12,28 @@ import { useForecast } from "../../context/ForecastContext"
 import { PageWrapper } from "@/components/page-wrapper"
 
 export default function DashboardPage() {
-  const { forecastData } = useForecast()
-  const [isLoading, setIsLoading] = useState(false)
+  const { user, loading } = useAuth()
+  const router = useRouter()
+  const { forecastData, isLoading } = useForecast()
+  const [isInitialLoading, setIsInitialLoading] = useState(false)
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login")
+    }
+  }, [user, loading, router])
 
   useEffect(() => {
     if (forecastData.length > 0) {
-      setIsLoading(true)
-      const timer = setTimeout(() => setIsLoading(false), 1000)
+      setIsInitialLoading(true)
+      const timer = setTimeout(() => setIsInitialLoading(false), 1000)
       return () => clearTimeout(timer)
     }
   }, [forecastData.length])
 
-  if (isLoading) {
+  if (loading || !user) return null
+
+  if (isLoading || isInitialLoading) {
     return (
       <PageWrapper>
         <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 py-12 sm:py-16 lg:py-24 overflow-x-hidden bg-white">
