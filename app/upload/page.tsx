@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,12 +9,7 @@ import { toast } from "sonner"
 import { CheckCircle, AlertCircle, FileText } from "lucide-react"
 import { useForecast } from "../../context/ForecastContext"
 import { PageWrapper } from "@/components/page-wrapper"
-<<<<<<< HEAD
-import { useEffect } from "react"
 import { useAuth } from "@/components/auth-provider"
-=======
-import { DatabaseService } from "@/lib/database"
->>>>>>> feature-persistent_storage
 
 interface ForecastData {
   date: string
@@ -91,26 +86,11 @@ export default function UploadPage() {
     setIsProcessing(true)
 
     try {
-<<<<<<< HEAD
       // Simulate processing
       await new Promise(resolve => setTimeout(resolve, 3000))
       
       // Generate mock forecast data
-      const mockData = [
-=======
-      // Read file content
-      const csvContent = await file.text()
-      
-      // Upload to database
-      const { rowCount } = await DatabaseService.uploadSalesData(file, csvContent)
-      
-      toast.success("Data uploaded successfully!", {
-        description: `${rowCount} records uploaded to database.`,
-      })
-
-      // Use mock forecast data (this will be replaced with actual model output later)
       const mockData: ForecastData[] = [
->>>>>>> feature-persistent_storage
         { date: "2024-07-23", forecast: 1200, confidence: 50 },
         { date: "2024-07-24", forecast: 1350, confidence: 75 },
         { date: "2024-07-25", forecast: 1100, confidence: 60 },
@@ -119,7 +99,6 @@ export default function UploadPage() {
         { date: "2024-07-28", forecast: 1600, confidence: 90 },
         { date: "2024-07-29", forecast: 1250, confidence: 55 },
       ]
-<<<<<<< HEAD
 
       // Save to database
       await saveForecastToDatabase(mockData)
@@ -135,17 +114,6 @@ export default function UploadPage() {
         description: "Please try again or contact support if the problem persists.",
       })
     } finally {
-=======
-      
-      setForecastData(mockData)
-      setIsProcessing(false)
-      router.push("/dashboard")
-    } catch (error) {
-      console.error('Upload error:', error)
-      toast.error("Upload failed", {
-        description: error instanceof Error ? error.message : "Failed to upload data to database.",
-      })
->>>>>>> feature-persistent_storage
       setIsProcessing(false)
     }
   }
@@ -188,7 +156,7 @@ export default function UploadPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 items-start">
           {/* Requirements Card */}
           <div className="lg:col-span-5 order-2 lg:order-1 animate-fade-in-delay-1">
-            <Card className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-xl h-full hover:scale-[1.02] transition-all duration-300">
+            <Card variant="static" className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-xl h-full">
               <CardHeader className="pb-6 sm:pb-8 pt-8 sm:pt-10 px-8 sm:px-10">
                 <CardTitle className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-3">
                   <FileText className="h-6 w-6 text-blue-600" strokeWidth={1.5} />
@@ -238,7 +206,7 @@ export default function UploadPage() {
 
           {/* Upload Card */}
           <div className="lg:col-span-7 order-1 lg:order-2 animate-fade-in">
-            <Card className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-2xl hover:scale-[1.02] transition-all duration-300">
+            <Card variant="static" className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-2xl">
               <CardHeader className="pb-6 sm:pb-8 pt-8 sm:pt-10 px-8 sm:px-10">
                 <CardTitle className="text-xl font-bold text-gray-900 mb-4">Upload Your Data</CardTitle>
                 <CardDescription className="text-base text-gray-600 leading-relaxed text-balance">

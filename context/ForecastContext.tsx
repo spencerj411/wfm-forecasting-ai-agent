@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react"
 import { useAuth } from "@/components/auth-provider"
 import { forecastService, ForecastData } from "@/lib/database"
 import { toast } from "sonner"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 interface ForecastContextType {
   forecastData: ForecastData[]
@@ -20,6 +21,7 @@ export const ForecastProvider = ({ children }: { children: React.ReactNode }) =>
   const [forecastData, setForecastData] = useState<ForecastData[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const { user } = useAuth()
+  const supabase = createClientComponentClient()
 
   // Load user's forecast data when they log in
   useEffect(() => {
@@ -36,11 +38,13 @@ export const ForecastProvider = ({ children }: { children: React.ReactNode }) =>
 
     try {
       setIsLoading(true)
-      const data = await forecastService.loadForecast(user.id)
+      const data = await forecastService.loadForecast(supabase, user.id)
       setForecastData(data)
     } catch (error) {
-      console.error('Failed to load forecast data:', error)
-      toast.error('Failed to load your forecast data')
+      console.error('Failed to load forecast data:', error, JSON.stringify(error))
+      toast.error('Failed to load your forecast data', {
+        description: error instanceof Error ? error.message : JSON.stringify(error),
+      })
     } finally {
       setIsLoading(false)
     }
@@ -55,14 +59,16 @@ export const ForecastProvider = ({ children }: { children: React.ReactNode }) =>
     try {
       setIsLoading(true)
       // Clear existing data first
-      await forecastService.deleteForecast(user.id)
+      await forecastService.deleteForecast(supabase, user.id)
       // Save new data
-      const savedData = await forecastService.saveForecast(user.id, data)
+      const savedData = await forecastService.saveForecast(supabase, user.id, data)
       setForecastData(savedData)
       toast.success('Forecast data saved successfully')
     } catch (error) {
-      console.error('Failed to save forecast data:', error)
-      toast.error('Failed to save forecast data')
+      console.error('Failed to save forecast data:', error, JSON.stringify(error))
+      toast.error('Failed to save forecast data', {
+        description: error instanceof Error ? error.message : JSON.stringify(error),
+      })
     } finally {
       setIsLoading(false)
     }

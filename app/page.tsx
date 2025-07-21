@@ -8,6 +8,7 @@ import { FeaturesSection } from "@/components/features-section"
 
 export default function HomePage() {
   const { user } = useAuth()
+  console.log("ROOT PAGE: Rendering. User is:", user?.email);
 
   return (
     <PageWrapper>

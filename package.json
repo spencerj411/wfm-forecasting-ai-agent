@@ -12,10 +12,7 @@
     "@ai-sdk/openai": "^1.3.23",
     "@radix-ui/react-slot": "latest",
     "@radix-ui/react-toast": "latest",
-<<<<<<< HEAD
     "@supabase/auth-helpers-nextjs": "^0.10.0",
-=======
->>>>>>> feature-persistent_storage
     "@supabase/supabase-js": "^2.52.0",
     "ai": "^4.3.17",
     "class-variance-authority": "^0.7.1",

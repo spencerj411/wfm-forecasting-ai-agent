@@ -1,3 +1,10 @@
+// Type declaration for process.env to fix TS error in client components
+declare const process: {
+  env: {
+    NEXT_PUBLIC_DEV_AUTH_BYPASS?: string;
+  };
+};
+
 "use client"
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react"
@@ -42,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
     })
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("AUTH PROVIDER: Auth state changed, new user:", session?.user?.email);
       setUser(session?.user ?? null)
       setLoading(false)
     })

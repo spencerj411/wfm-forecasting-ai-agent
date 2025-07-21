@@ -3,6 +3,10 @@
 import Link from "next/link"
 import { TrendingUp, Upload, MessageCircle, BarChart3, CheckCircle, Database, Brain } from "lucide-react"
 import { ScrollAnimationWrapper } from "./scroll-animation-wrapper"
+import { Card } from "@/components/ui/card"
+
+const featureCardBaseStyle =
+  "p-12 sm:p-16 lg:p-20 h-auto rounded-3xl shadow-2xl transition-all duration-300"
 
 export function FeaturesSection() {
   return (
@@ -12,7 +16,10 @@ export function FeaturesSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
           <ScrollAnimationWrapper animationType="left" className="lg:col-span-6 order-2 lg:order-1">
             <Link href="/upload" className="block group">
-              <div className="relative bg-gray-50/90 backdrop-blur-md card-rounded p-12 sm:p-16 lg:p-20 h-auto shadow-xl transform -rotate-2 scale-hover cursor-pointer border border-gray-600/10 hover:scale-[1.02] transition-all duration-300">
+              <Card
+                variant="interactive"
+                className={`${featureCardBaseStyle} bg-gradient-to-br from-pink-50 via-blue-50 to-indigo-100`}
+              >
                 <div className="flex flex-col items-center justify-center h-full space-y-8">
                   <div className="relative">
                     <div className="w-20 h-20 sm:w-24 sm:h-24 bg-blue-600/10 rounded-full flex items-center justify-center">
@@ -31,7 +38,7 @@ export function FeaturesSection() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </Card>
             </Link>
           </ScrollAnimationWrapper>
           <ScrollAnimationWrapper
@@ -74,7 +81,10 @@ export function FeaturesSection() {
           </ScrollAnimationWrapper>
           <ScrollAnimationWrapper animationType="right" className="lg:col-span-6">
             <Link href="/dashboard" className="block group">
-              <div className="relative bg-green-50/40 backdrop-blur-md card-rounded p-12 sm:p-16 lg:p-20 h-auto shadow-xl transform rotate-2 scale-hover cursor-pointer border border-green-600/10 hover:scale-[1.02] transition-all duration-300">
+              <Card
+                variant="interactive"
+                className={`${featureCardBaseStyle} bg-gradient-to-br from-green-50 via-teal-50 to-emerald-100`}
+              >
                 <div className="flex flex-col items-center justify-center h-full space-y-8">
                   <div className="relative">
                     <div className="w-20 h-20 sm:w-24 sm:h-24 bg-green-600/10 rounded-full flex items-center justify-center">
@@ -93,7 +103,7 @@ export function FeaturesSection() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </Card>
             </Link>
           </ScrollAnimationWrapper>
         </div>
@@ -102,7 +112,10 @@ export function FeaturesSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
           <ScrollAnimationWrapper animationType="left" className="lg:col-span-6 order-2 lg:order-1">
             <Link href="/chat" className="block group">
-              <div className="relative bg-blue-50/40 backdrop-blur-md card-rounded p-12 sm:p-16 lg:p-20 h-auto shadow-xl transform -rotate-1 scale-hover cursor-pointer border border-blue-600/10 hover:scale-[1.02] transition-all duration-300">
+              <Card
+                variant="interactive"
+                className={`${featureCardBaseStyle} bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100`}
+              >
                 <div className="flex flex-col items-center justify-center h-full space-y-8">
                   <div className="relative">
                     <div className="w-20 h-20 sm:w-24 sm:h-24 bg-blue-600/10 rounded-full flex items-center justify-center">
@@ -118,7 +131,7 @@ export function FeaturesSection() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </Card>
             </Link>
           </ScrollAnimationWrapper>
           <ScrollAnimationWrapper

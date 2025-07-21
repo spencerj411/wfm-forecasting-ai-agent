@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PageWrapper } from "@/components/page-wrapper"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { AuthError } from "@supabase/supabase-js"
 
@@ -34,6 +33,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
+      console.log("LOGIN PAGE: User object is present, redirecting to /home...");
       router.replace("/home")
     }
   }, [user, router])
@@ -50,7 +50,12 @@ export default function LoginPage() {
         return
       }
       if (provider) {
-        const { error } = await supabase.auth.signInWithOAuth({ provider })
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo: `${location.origin}/auth/callback`,
+          },
+        })
         if (error) throw error
         return
       }
@@ -69,96 +74,94 @@ export default function LoginPage() {
   }
 
   return (
-    <PageWrapper>
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <h1 className="sr-only">Login to Demand Forecasting Agent</h1>
-        <Card className="w-full max-w-md mx-auto card-rounded shadow-2xl border-0 animate-fade-in">
-          <CardHeader className="pb-4 pt-8 text-center">
-            <CardTitle className="text-3xl font-bold text-gray-900 mb-2">{isSignUp ? "Sign Up" : "Login"}</CardTitle>
-            <p className="text-gray-600 text-base font-light">
-              {isSignUp ? "Create your account to get started" : "Sign in to your account"}
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-6 pb-8">
-            <form
-              onSubmit={e => {
-                e.preventDefault()
-                handleAuth()
-              }}
-              className="space-y-4"
-            >
-              {!isDevBypass && (
-                <>
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-base"
-                    required
-                    autoComplete="email"
-                    disabled={loadingAuth}
-                  />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-base"
-                    required
-                    autoComplete={isSignUp ? "new-password" : "current-password"}
-                    disabled={loadingAuth}
-                  />
-                </>
-              )}
-              {isDevBypass && (
-                <div className="text-center text-gray-500 text-sm">Dev mode: just click Login</div>
-              )}
-              {error && <div className="text-red-600 text-sm font-medium text-center">{error}</div>}
-              <Button
-                type="submit"
-                variant="gradient"
-                size="lg"
-                className="w-full font-semibold"
-                disabled={loadingAuth}
-              >
-                {loadingAuth ? (isSignUp ? "Signing Up..." : "Logging In...") : isSignUp ? "Sign Up" : "Login"}
-              </Button>
-            </form>
-            <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
-              <span>{isSignUp ? "Already have an account?" : "Don't have an account?"}</span>
-              <button
-                className="text-blue-600 font-semibold hover:underline"
-                onClick={() => setIsSignUp(!isSignUp)}
-                disabled={loadingAuth}
-              >
-                {isSignUp ? "Login" : "Sign Up"}
-              </button>
-            </div>
-            <div className="flex items-center gap-2 my-2">
-              <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-gray-400 text-xs">or</span>
-              <div className="flex-1 h-px bg-gray-200" />
-            </div>
-            <div className="flex flex-col gap-3">
-              {(["google", "azure", "apple"] as const).map((provider) => (
-                <Button
-                  key={provider}
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  className="w-full flex items-center justify-center gap-3 font-semibold"
-                  onClick={() => handleAuth(provider)}
+    <div className="flex h-screen items-center justify-center bg-white px-4">
+      <h1 className="sr-only">Login to Demand Forecasting Agent</h1>
+      <Card variant="static" className="w-full max-w-md mx-auto card-rounded shadow-2xl border-0 animate-fade-in">
+        <CardHeader className="pb-4 pt-8 text-center">
+          <CardTitle className="text-3xl font-bold text-gray-900 mb-2">{isSignUp ? "Sign Up" : "Login"}</CardTitle>
+          <p className="text-gray-600 text-base font-light">
+            {isSignUp ? "Create your account to get started" : "Sign in to your account"}
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6 pb-8">
+          <form
+            onSubmit={e => {
+              e.preventDefault()
+              handleAuth()
+            }}
+            className="space-y-4"
+          >
+            {!isDevBypass && (
+              <>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-base"
+                  required
+                  autoComplete="email"
                   disabled={loadingAuth}
-                >
-                  {providerIcons[provider]}
-                  <span>Continue with {provider === 'azure' ? 'Microsoft' : provider.charAt(0).toUpperCase() + provider.slice(1)}</span>
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </PageWrapper>
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-base"
+                  required
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                  disabled={loadingAuth}
+                />
+              </>
+            )}
+            {isDevBypass && (
+              <div className="text-center text-gray-500 text-sm">Dev mode: just click Login</div>
+            )}
+            {error && <div className="text-red-600 text-sm font-medium text-center">{error}</div>}
+            <Button
+              type="submit"
+              variant="gradient"
+              size="lg"
+              className="w-full font-semibold"
+              disabled={loadingAuth}
+            >
+              {loadingAuth ? (isSignUp ? "Signing Up..." : "Logging In...") : isSignUp ? "Sign Up" : "Login"}
+            </Button>
+          </form>
+          <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
+            <span>{isSignUp ? "Already have an account?" : "Don't have an account?"}</span>
+            <button
+              className="text-blue-600 font-semibold hover:underline"
+              onClick={() => setIsSignUp(!isSignUp)}
+              disabled={loadingAuth}
+            >
+              {isSignUp ? "Login" : "Sign Up"}
+            </button>
+          </div>
+          <div className="flex items-center gap-2 my-2">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-gray-400 text-xs">or</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+          <div className="flex flex-col gap-3">
+            {(["google", "azure", "apple"] as const).map((provider) => (
+              <Button
+                key={provider}
+                type="button"
+                variant="outline"
+                size="lg"
+                className="w-full flex items-center justify-center gap-3 font-semibold"
+                onClick={() => handleAuth(provider)}
+                disabled={loadingAuth}
+              >
+                {providerIcons[provider]}
+                <span>Continue with {provider === 'azure' ? 'Microsoft' : provider.charAt(0).toUpperCase() + provider.slice(1)}</span>
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 } 
