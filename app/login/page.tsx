@@ -33,7 +33,6 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      console.log("LOGIN PAGE: User object is present, redirecting to /home...");
       router.replace("/home")
     }
   }, [user, router])

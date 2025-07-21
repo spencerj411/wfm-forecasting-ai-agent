@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { Upload, FileText } from "lucide-react"
 
 interface FileUploaderProps {
+  // eslint-disable-next-line no-unused-vars
   onFileSelect: (file: File | null) => void
   error?: boolean
 }

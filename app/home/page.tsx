@@ -4,7 +4,6 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageWrapper } from "@/components/page-wrapper"
 import { useForecast } from "@/context/ForecastContext"
@@ -50,10 +49,10 @@ export default function AuthenticatedHomePage() {
             Welcome back, <span className="text-blue-600">{user.email}</span>
           </h1>
           {hasData ? (
-            <p className="text-xl text-gray-600 font-light">Here's a quick summary of your latest forecast.</p>
+            <p className="text-xl text-gray-600 font-light">Here&apos;s a quick summary of your latest forecast.</p>
           ) : (
             <p className="text-xl text-gray-600 font-light">
-              You haven't generated a forecast yet. Once you upload your data, you'll see a quick peek of your dashboard
+              You haven&apos;t generated a forecast yet. Once you upload your data, you&apos;ll see a quick peek of your dashboard
               right here.
             </p>
           )}

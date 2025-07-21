@@ -18,15 +18,6 @@ interface Message {
 export default function ChatPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace("/login")
-    }
-  }, [user, loading, router])
-
-  if (loading || !user) return null
-
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -40,6 +31,22 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login")
+    }
+  }, [user, loading, router])
+
+  useEffect(() => {
+    if (messages.length > 1 || isLoading) {
+      scrollToBottom()
+    }
+  }, [messages, isLoading])
+
+  if (loading || !user) {
+    return null
+  }
+
   const sampleQuestions = [
     "What's the forecast for July 23rd?",
     "Which day has the highest predicted sales?",
@@ -50,10 +57,6 @@ export default function ChatPage() {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages, isLoading])
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return

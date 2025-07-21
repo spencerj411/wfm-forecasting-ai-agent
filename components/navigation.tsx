@@ -7,8 +7,9 @@ import { cn } from "@/lib/utils"
 import { Menu, X, LogOut } from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "./ui/button"
+import { User } from "@supabase/supabase-js"
 
-function UserAvatar({ user, onSignOut }: { user: any; onSignOut: () => void }) {
+function UserAvatar({ user, onSignOut }: { user: User; onSignOut: () => void }) {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 

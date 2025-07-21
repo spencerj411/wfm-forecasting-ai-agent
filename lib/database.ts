@@ -1,19 +1,9 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-// Type declaration for environment variables
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-      NEXT_PUBLIC_SUPABASE_URL: string
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: string
-    }
-  }
-}
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+)
 
 export interface ForecastData {
   id?: string
@@ -30,6 +20,14 @@ export interface UploadedFile {
   filename: string
   file_size: number
   uploaded_at?: string
+}
+
+export interface SalesData {
+  id?: string
+  file_id: number
+  user_id?: string
+  timestamp: string
+  sales: number
 }
 
 // --- User-aware forecast and file services (main API) ---
@@ -174,7 +172,7 @@ export class DatabaseUtils {
   }
 
   // Get sales data for a specific file
-  static async getSalesData(supabaseClient: SupabaseClient, fileId: number): Promise<any[]> {
+  static async getSalesData(supabaseClient: SupabaseClient, fileId: number): Promise<SalesData[]> {
     const { data, error } = await supabaseClient
       .from('sales_data')
       .select('*')

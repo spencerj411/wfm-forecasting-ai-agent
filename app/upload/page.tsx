@@ -20,6 +20,10 @@ interface ForecastData {
 export default function UploadPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const [file, setFile] = useState<File | null>(null)
+  const { saveForecastToDatabase } = useForecast()
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [validationError, setValidationError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -28,11 +32,6 @@ export default function UploadPage() {
   }, [user, loading, router])
 
   if (loading || !user) return null
-
-  const [file, setFile] = useState<File | null>(null)
-  const { saveForecastToDatabase } = useForecast()
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [validationError, setValidationError] = useState<string | null>(null)
 
   const validateCSV = (file: File): Promise<boolean> => {
     return new Promise((resolve) => {
