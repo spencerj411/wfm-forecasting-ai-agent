@@ -9,8 +9,12 @@ import { toast } from "sonner"
 import { CheckCircle, AlertCircle, FileText } from "lucide-react"
 import { useForecast } from "../../context/ForecastContext"
 import { PageWrapper } from "@/components/page-wrapper"
+<<<<<<< HEAD
 import { useEffect } from "react"
 import { useAuth } from "@/components/auth-provider"
+=======
+import { DatabaseService } from "@/lib/database"
+>>>>>>> feature-persistent_storage
 
 interface ForecastData {
   date: string
@@ -87,11 +91,26 @@ export default function UploadPage() {
     setIsProcessing(true)
 
     try {
+<<<<<<< HEAD
       // Simulate processing
       await new Promise(resolve => setTimeout(resolve, 3000))
       
       // Generate mock forecast data
       const mockData = [
+=======
+      // Read file content
+      const csvContent = await file.text()
+      
+      // Upload to database
+      const { rowCount } = await DatabaseService.uploadSalesData(file, csvContent)
+      
+      toast.success("Data uploaded successfully!", {
+        description: `${rowCount} records uploaded to database.`,
+      })
+
+      // Use mock forecast data (this will be replaced with actual model output later)
+      const mockData: ForecastData[] = [
+>>>>>>> feature-persistent_storage
         { date: "2024-07-23", forecast: 1200, confidence: 50 },
         { date: "2024-07-24", forecast: 1350, confidence: 75 },
         { date: "2024-07-25", forecast: 1100, confidence: 60 },
@@ -100,6 +119,7 @@ export default function UploadPage() {
         { date: "2024-07-28", forecast: 1600, confidence: 90 },
         { date: "2024-07-29", forecast: 1250, confidence: 55 },
       ]
+<<<<<<< HEAD
 
       // Save to database
       await saveForecastToDatabase(mockData)
@@ -115,6 +135,17 @@ export default function UploadPage() {
         description: "Please try again or contact support if the problem persists.",
       })
     } finally {
+=======
+      
+      setForecastData(mockData)
+      setIsProcessing(false)
+      router.push("/dashboard")
+    } catch (error) {
+      console.error('Upload error:', error)
+      toast.error("Upload failed", {
+        description: error instanceof Error ? error.message : "Failed to upload data to database.",
+      })
+>>>>>>> feature-persistent_storage
       setIsProcessing(false)
     }
   }

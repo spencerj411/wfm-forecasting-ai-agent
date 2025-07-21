@@ -17,9 +17,12 @@ importers:
       '@radix-ui/react-toast':
         specifier: latest
         version: 1.2.14(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+<<<<<<< HEAD
       '@supabase/auth-helpers-nextjs':
         specifier: ^0.10.0
         version: 0.10.0(@supabase/supabase-js@2.52.0)
+=======
+>>>>>>> feature-persistent_storage
       '@supabase/supabase-js':
         specifier: ^2.52.0
         version: 2.52.0
@@ -614,6 +617,7 @@ packages:
   '@rushstack/eslint-patch@1.12.0':
     resolution: {integrity: sha512-5EwMtOqvJMMa3HbmxLlF74e+3/HhwBTMcvt3nqVJgGCozO6hzIPOBlwm8mGVNR9SN2IJpxSnlxczyDjcn7qIyw==}
 
+<<<<<<< HEAD
   '@supabase/auth-helpers-nextjs@0.10.0':
     resolution: {integrity: sha512-2dfOGsM4yZt0oS4TPiE7bD4vf7EVz7NRz/IJrV6vLg0GP7sMUx8wndv2euLGq4BjN9lUCpu6DG/uCC8j+ylwPg==}
     deprecated: This package is now deprecated - please use the @supabase/ssr package instead.
@@ -626,6 +630,8 @@ packages:
     peerDependencies:
       '@supabase/supabase-js': ^2.39.8
 
+=======
+>>>>>>> feature-persistent_storage
   '@supabase/auth-js@2.71.1':
     resolution: {integrity: sha512-mMIQHBRc+SKpZFRB2qtupuzulaUhFYupNyxqDj5Jp/LyPvcWvjaJzZzObv6URtL/O6lPxkanASnotGtNpS3H2Q==}
 
@@ -2975,6 +2981,7 @@ snapshots:
 
   '@rushstack/eslint-patch@1.12.0': {}
 
+<<<<<<< HEAD
   '@supabase/auth-helpers-nextjs@0.10.0(@supabase/supabase-js@2.52.0)':
     dependencies:
       '@supabase/auth-helpers-shared': 0.7.0(@supabase/supabase-js@2.52.0)
@@ -2986,6 +2993,8 @@ snapshots:
       '@supabase/supabase-js': 2.52.0
       jose: 4.15.9
 
+=======
+>>>>>>> feature-persistent_storage
   '@supabase/auth-js@2.71.1':
     dependencies:
       '@supabase/node-fetch': 2.6.15
