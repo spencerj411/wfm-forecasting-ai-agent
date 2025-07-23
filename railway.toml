@@ -1,8 +1,2 @@
 [build]
-# Build from the /api directory only
-watchPaths = ["api/**"]
-
-[deploy]
-# Start command (absolute path required)
-startCommand = "cd api && gunicorn main:app"
-healthcheckPath = "/health"
+rootDir = "api"
