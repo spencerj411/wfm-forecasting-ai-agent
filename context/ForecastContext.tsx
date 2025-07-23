@@ -6,9 +6,30 @@ import { forecastService, ForecastData } from "@/lib/database"
 import { toast } from "sonner"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
+interface ModelMetrics {
+  mape: number
+  bias: number
+  mae: number
+  rmse: number
+  r2: number
+}
+
+interface DataSummary {
+  total_records: number
+  date_range: {
+    start: string
+    end: string
+  }
+  average_daily_sales: number
+}
+
 interface ForecastContextType {
   forecastData: ForecastData[]
+  modelMetrics: ModelMetrics | null
+  dataSummary: DataSummary | null
   setForecastData: (data: ForecastData[]) => void
+  setModelMetrics: (metrics: ModelMetrics | null) => void
+  setDataSummary: (summary: DataSummary | null) => void
   saveForecastToDatabase: (data: Omit<ForecastData, 'user_id' | 'id' | 'created_at'>[]) => Promise<void>
   loadForecastFromDatabase: () => Promise<void>
   clearForecastData: () => void
@@ -19,6 +40,8 @@ const ForecastContext = createContext<ForecastContextType | undefined>(undefined
 
 export const ForecastProvider = ({ children }: { children: React.ReactNode }) => {
   const [forecastData, setForecastData] = useState<ForecastData[]>([])
+  const [modelMetrics, setModelMetrics] = useState<ModelMetrics | null>(null)
+  const [dataSummary, setDataSummary] = useState<DataSummary | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const { user } = useAuth()
   const supabase = createClientComponentClient()
@@ -30,6 +53,8 @@ export const ForecastProvider = ({ children }: { children: React.ReactNode }) =>
     } else {
       // Clear data when user logs out
       setForecastData([])
+      setModelMetrics(null)
+      setDataSummary(null)
     }
   }, [user])
 
@@ -76,12 +101,18 @@ export const ForecastProvider = ({ children }: { children: React.ReactNode }) =>
 
   const clearForecastData = () => {
     setForecastData([])
+    setModelMetrics(null)
+    setDataSummary(null)
   }
 
   return (
     <ForecastContext.Provider value={{ 
       forecastData, 
+      modelMetrics,
+      dataSummary,
       setForecastData, 
+      setModelMetrics,
+      setDataSummary,
       saveForecastToDatabase, 
       loadForecastFromDatabase, 
       clearForecastData,

@@ -113,8 +113,8 @@ export function ForecastTable({ data }: ForecastTableProps) {
                     <span className="hidden sm:block">{formatDate(row.date).full}</span>
                   </TableCell>
                   <TableCell className="text-gray-900 py-6 sm:py-8 lg:py-10 px-6 sm:px-8 lg:px-12 font-bold text-base sm:text-lg">
-                    <span className="truncate block" title={`$${row.forecast.toLocaleString()} ± $${row.confidence}`}>
-                      ${row.forecast.toLocaleString()} ± ${row.confidence}
+                    <span className="truncate block" title={`$${row.forecast.toLocaleString()}`}>
+                      ${row.forecast.toLocaleString()}
                     </span>
                   </TableCell>
                   <TableCell className="py-6 sm:py-8 lg:py-10 px-6 sm:px-8 lg:px-12">
@@ -166,7 +166,7 @@ export function ForecastTable({ data }: ForecastTableProps) {
                   <div className="flex items-center justify-between">
                     <span className="text-base text-gray-600 font-semibold">Forecast Sales</span>
                     <span className="font-bold text-gray-900 text-base sm:text-lg">
-                      ${row.forecast.toLocaleString()} ± ${row.confidence}
+                      ${row.forecast.toLocaleString()}
                     </span>
                   </div>
                   <div className="space-y-3">

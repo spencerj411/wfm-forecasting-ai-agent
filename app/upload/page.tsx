@@ -21,7 +21,7 @@ export default function UploadPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
-  const { saveForecastToDatabase } = useForecast()
+  const { saveForecastToDatabase, setModelMetrics, setDataSummary } = useForecast()
   const [isProcessing, setIsProcessing] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
 
@@ -85,59 +85,125 @@ export default function UploadPage() {
     setIsProcessing(true)
 
     try {
-      // Simulate processing
-      await new Promise(resolve => setTimeout(resolve, 3000))
+      // Read file content
+      const fileContent = await file.text()
       
-      // Generate mock forecast data
-      const mockData: ForecastData[] = [
-        { date: "2024-07-23", forecast: 1200, confidence: 50 },
-        { date: "2024-07-24", forecast: 1350, confidence: 75 },
-        { date: "2024-07-25", forecast: 1100, confidence: 60 },
-        { date: "2024-07-26", forecast: 1450, confidence: 80 },
-        { date: "2024-07-27", forecast: 1300, confidence: 65 },
-        { date: "2024-07-28", forecast: 1600, confidence: 90 },
-        { date: "2024-07-29", forecast: 1250, confidence: 55 },
-      ]
+      // Call Prophet forecasting API (local development server)
+      const apiUrl = process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:8000/api/forecast' 
+        : '/api/forecast'
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          csv_data: fileContent
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Forecasting failed')
+      }
+
+      const result = await response.json()
+      const forecastData: ForecastData[] = result.forecast
+
+      // Store model metrics and data summary in context
+      if (result.metrics) {
+        setModelMetrics(result.metrics)
+      }
+      if (result.data_summary) {
+        setDataSummary(result.data_summary)
+      }
 
       // Save to database
-      await saveForecastToDatabase(mockData)
+      await saveForecastToDatabase(forecastData)
+      
+      const accuracyText = result.metrics?.mape 
+        ? `${(result.metrics.mape * 100).toFixed(1)}% MAPE` 
+        : 'high accuracy'
       
       toast.success("Forecast completed!", {
-        description: "Your demand forecast has been generated and saved successfully.",
+        description: `Generated ${forecastData.length}-day forecast with ${accuracyText}. Model trained on ${result.data_summary?.total_records || 'historical'} data points.`,
       })
       
       router.push("/dashboard")
     } catch (error) {
       console.error('Forecast processing failed:', error)
-      toast.error("Forecast processing failed", {
-        description: "Please try again or contact support if the problem persists.",
+      
+      let errorMessage = "Forecast processing failed"
+      let errorDescription = "Please try again or contact support if the problem persists."
+      
+      if (error instanceof Error) {
+        // Handle specific Prophet/API errors
+        if (error.message.includes('Need at least 2 valid data points')) {
+          errorMessage = "Insufficient data"
+          errorDescription = "Your CSV needs at least 2 rows of valid date and sales data."
+        } else if (error.message.includes('date') && error.message.includes('sales')) {
+          errorMessage = "Invalid CSV format"
+          errorDescription = "Your CSV must contain 'date' and 'sales' columns with valid data."
+        } else if (error.message.includes('Prophet')) {
+          errorMessage = "Model training failed"
+          errorDescription = "The AI model couldn't process your data. Check for missing values or unusual patterns."
+        } else {
+          errorDescription = error.message
+        }
+      }
+      
+      toast.error(errorMessage, {
+        description: errorDescription,
       })
     } finally {
       setIsProcessing(false)
     }
   }
 
-  const downloadSampleCSV = () => {
-    const sampleData = `date,sales
-2024-01-01,1200
-2024-01-02,1350
-2024-01-03,1100
-2024-01-04,1450
-2024-01-05,1300
-2024-01-06,1600
-2024-01-07,1250`
+  const downloadSampleCSV = async () => {
+    try {
+      // Fetch the complete 3-year sample dataset
+      const response = await fetch('/sample-sales-data.csv')
+      const sampleData = await response.text()
 
-    const blob = new Blob([sampleData], { type: "text/csv" })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "sample-sales-data.csv"
-    a.click()
-    window.URL.revokeObjectURL(url)
+      const blob = new Blob([sampleData], { type: "text/csv" })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "sample-sales-data.csv"
+      a.click()
+      window.URL.revokeObjectURL(url)
 
-    toast.success("Sample CSV downloaded!", {
-      description: "Use this template for your sales data.",
-    })
+      toast.success("Sample CSV downloaded!", {
+        description: "3 years of realistic sales data with seasonality and trends.",
+      })
+    } catch {
+      // Fallback to inline data if fetch fails
+      const fallbackData = `date,sales
+2022-01-01,1513
+2022-01-02,1520
+2022-01-03,1482
+2022-01-04,1449
+2022-01-05,1412
+2022-01-06,1293
+2022-01-07,1387
+2022-01-08,1549
+2022-01-09,1661
+2022-01-10,1578`
+
+      const blob = new Blob([fallbackData], { type: "text/csv" })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "sample-sales-data.csv"
+      a.click()
+      window.URL.revokeObjectURL(url)
+
+      toast.success("Sample CSV downloaded!", {
+        description: "Basic sample data for testing.",
+      })
+    }
   }
 
   return (

@@ -14,7 +14,7 @@ import { PageWrapper } from "@/components/page-wrapper"
 export default function DashboardPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const { forecastData, isLoading } = useForecast()
+  const { forecastData, modelMetrics, dataSummary, isLoading } = useForecast()
   const [isInitialLoading, setIsInitialLoading] = useState(false)
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function DashboardPage() {
         <div className="mb-12 sm:mb-16 space-y-4 text-left animate-fade-in">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">Forecast Dashboard</h1>
           <p className="text-xl text-gray-600 font-light">
-            7-day intelligent demand forecast with confidence intervals
+            7-day intelligent demand forecast for the upcoming week
           </p>
         </div>
 
@@ -108,7 +108,7 @@ export default function DashboardPage() {
                       ${totalForecast.toLocaleString()}
                     </p>
                     <p className="text-lg text-gray-600 font-light text-balance">
-                      Projected revenue for the next 7 days based on historical patterns and trends
+                      Projected revenue for the upcoming week based on historical patterns and trends
                     </p>
                   </div>
                 </CardContent>
@@ -160,6 +160,32 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Simple Model Quality Indicator */}
+        {modelMetrics && (
+          <div className="mb-8 sm:mb-12 animate-fade-in-delay-1">
+            <div className="text-center">
+              <div className={`inline-flex items-center space-x-2 px-4 py-2 rounded-full ${
+                modelMetrics.mape <= 0.1 ? 'bg-green-100 text-green-800' : 
+                modelMetrics.mape <= 0.2 ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'
+              }`}>
+                <div className={`w-2 h-2 rounded-full ${
+                  modelMetrics.mape <= 0.1 ? 'bg-green-600' : 
+                  modelMetrics.mape <= 0.2 ? 'bg-blue-600' : 'bg-orange-600'
+                }`}></div>
+                <span className="font-semibold text-sm">
+                  Model Accuracy: {modelMetrics.mape <= 0.1 ? 'Excellent' : 
+                                   modelMetrics.mape <= 0.2 ? 'Good' : 'Fair'}
+                </span>
+              </div>
+              {dataSummary && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Based on {dataSummary.total_records.toLocaleString()} days of historical data
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Forecast Table */}
         <div className="animate-fade-in-delay-2 forecast-table-container">
           <Card variant="static" className="bg-gray-50/90 backdrop-blur-md border-0 card-rounded shadow-2xl overflow-hidden">
@@ -173,7 +199,7 @@ export default function DashboardPage() {
                     <span className="truncate">7-Day Forecast Analysis</span>
                   </CardTitle>
                   <CardDescription className="text-lg text-gray-600 leading-relaxed text-balance">
-                    Detailed predictions with confidence intervals and trend analysis
+                    Detailed predictions for the upcoming week with confidence intervals
                   </CardDescription>
                 </div>
                 <Link href="/chat">
