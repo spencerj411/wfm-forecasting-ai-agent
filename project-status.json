@@ -53,13 +53,37 @@
       "priority": "medium", 
       "tasks": [
         "Incremental data uploads (append new data vs replace)",
+        "Update upload UI to support append/replace modes with data conflict resolution",
         "Model persistence (save/load trained models)", 
         "Multiple CSV combining and merging",
         "Custom seasonality settings (retail vs restaurant patterns)",
         "Outlier detection and handling",
         "Holiday/event impact modeling",
         "Data quality scoring and recommendations",
-        "Model retraining triggers and schedules"
+        "Model retraining triggers and schedules",
+        "Data versioning and rollback capabilities"
+      ]
+    },
+    {
+      "feature": "Background Processing",
+      "priority": "low",
+      "tasks": [
+        "Background forecast processing (allow user to leave page)",
+        "Job queue system for long-running forecasts", 
+        "Real-time progress updates and notifications",
+        "Polling mechanism for forecast status"
+      ]
+    },
+    {
+      "feature": "Enhanced Loading UX",
+      "priority": "medium",
+      "tasks": [
+        "Progressive loading messages (data validation → model training → forecasting → finalizing)",
+        "Time estimates for forecast processing based on data size",
+        "Progress bar or percentage indicator during model execution",
+        "Keep-alive messages to prevent user anxiety during long processing",
+        "Educational tips about Prophet AI while user waits",
+        "Cancel/abort forecast option for long-running processes"
       ]
     },
     {

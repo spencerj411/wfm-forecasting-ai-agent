@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileUploader } from "../../components/file-uploader"
 import { toast } from "sonner"
-import { CheckCircle, AlertCircle, FileText } from "lucide-react"
+import { CheckCircle, AlertCircle, FileText, Loader2 } from "lucide-react"
 import { useForecast } from "../../context/ForecastContext"
 import { PageWrapper } from "@/components/page-wrapper"
 import { useAuth } from "@/components/auth-provider"
@@ -318,7 +318,14 @@ export default function UploadPage() {
                       className="w-full font-semibold"
                       aria-label="Run forecast analysis on uploaded data"
                     >
-                      {isProcessing ? "Processing..." : "Run Forecast Analysis"}
+                      {isProcessing ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Analyzing data with Prophet AI...
+                        </>
+                      ) : (
+                        "Run Forecast Analysis"
+                      )}
                     </Button>
                   </div>
                 </div>
