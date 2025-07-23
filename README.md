@@ -13,8 +13,8 @@ An AI-powered demand forecasting application that helps store managers analyze s
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15.2.4, React, TypeScript
-- **Backend**: Python Flask API (Railway)
+- **Frontend**: Next.js 15.2.4, React, TypeScript (`/frontend`)
+- **Backend**: Python Flask API (`/api`) deployed on Railway
 - **AI/ML**: Meta Prophet for time series forecasting
 - **Database**: Supabase for user data and forecasts
 - **Deployment**: Vercel (Frontend) + Railway (API)
@@ -36,36 +36,29 @@ An AI-powered demand forecasting application that helps store managers analyze s
    cd wfm-forecasting-ai-agent
    ```
 
-2. **Install Node.js dependencies**
+2. **Run setup script**
    ```bash
-   pnpm install
+   ./scripts/setup.sh
+   ```
+   This will:
+   - Create Python virtual environment
+   - Install all dependencies (Python + Node.js)
+   - Create environment file template
+
+3. **Configure environment**
+   - Edit `frontend/.env.local` with your Supabase credentials
+   - API URL is already set to `http://localhost:8000`
+
+4. **Start development servers**
+
+   **Terminal 1 - API Server:**
+   ```bash
+   ./scripts/start-api.sh
    ```
 
-3. **Set up Python environment**
+   **Terminal 2 - Frontend Server:**
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-4. **Environment configuration**
-   - Copy `.env.example` to `.env.local`
-   - Add your Supabase credentials and API URL:
-   ```bash
-   NEXT_PUBLIC_API_URL=http://localhost:8000
-   ```
-
-5. **Start the development servers**
-
-   **Terminal 1 - Prophet API Server:**
-   ```bash
-   source venv/bin/activate
-   python main.py
-   ```
-
-   **Terminal 2 - Next.js Frontend:**
-   ```bash
-   pnpm run dev
+   ./scripts/start-frontend.sh
    ```
 
 6. **Access the application**
