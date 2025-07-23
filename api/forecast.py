@@ -6,7 +6,6 @@ from io import StringIO
 from http.server import BaseHTTPRequestHandler
 import traceback
 from datetime import datetime, timedelta
-# from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error, mean_squared_error, r2_score
 import logging
 
 # Set up logging for debugging
