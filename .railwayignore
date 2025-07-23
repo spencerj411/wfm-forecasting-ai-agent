@@ -1,0 +1,11 @@
+package.json
+package-lock.json
+pnpm-lock.yaml
+node_modules/
+app/
+components/
+public/
+styles/
+next.config.ts
+tsconfig.json
+tailwind.config.ts
