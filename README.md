@@ -1,45 +1,117 @@
 # WFM Demand Forecasting AI Agent
 
-NOTE: This project is focused on developing the Minimum Viable Product (MVP) for an AI agent that assists in analysing demand forecast data in a WFM context.
+An AI-powered demand forecasting application that helps store managers analyze sales data and generate accurate 7-day forecasts using Meta's Prophet algorithm. Built with Next.js and deployed on Vercel.
 
-## Project Setup
+## Features
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+- 📊 **Smart Forecasting**: Generate precise 7-day demand forecasts with confidence intervals
+- 📈 **Data Upload**: Easy CSV upload with validation and error handling
+- 🤖 **AI Chat Assistant**: Ask natural language questions about your forecasts
+- 📱 **Responsive Dashboard**: Clean, modern interface with real-time insights
+- 🔐 **User Authentication**: Secure login with personal data storage
+- ⚡ **Fast Performance**: Optimized Prophet model with industry-standard metrics
 
-### Getting Started
+## Tech Stack
 
-First, run the development server:
+- **Frontend**: Next.js 15.2.4, React, TypeScript
+- **Backend**: Python serverless functions (Vercel)
+- **AI/ML**: Meta Prophet for time series forecasting
+- **Database**: Supabase for user data and forecasts
+- **Deployment**: Vercel
+- **Styling**: Tailwind CSS
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and pnpm
+- Python 3.9+ with virtual environment support
+- Git
+
+### Local Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd wfm-forecasting-ai-agent
+   ```
+
+2. **Install Node.js dependencies**
+   ```bash
+   pnpm install
+   ```
+
+3. **Set up Python environment**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+
+4. **Environment configuration**
+   - Copy `.env.example` to `.env.local`
+   - Add your Supabase credentials and other environment variables
+
+5. **Start the development servers**
+
+   **Terminal 1 - Prophet API Server:**
+   ```bash
+   source venv/bin/activate
+   python scripts/local_test_server.py --port 8000
+   ```
+
+   **Terminal 2 - Next.js Frontend:**
+   ```bash
+   pnpm run dev
+   ```
+
+6. **Access the application**
+   - Frontend: http://localhost:3000
+   - Prophet API: http://localhost:8000/api/forecast
+   - Health Check: http://localhost:8000/health
+
+### How It Works
+
+1. **Upload Data**: Upload a CSV file with `date` and `sales` columns
+2. **Generate Forecast**: The Prophet model analyzes patterns and generates 7-day predictions
+3. **View Dashboard**: See forecasts with confidence intervals and model accuracy metrics
+4. **Ask Questions**: Use the AI chat to get insights about your forecasts
+
+### Sample Data Format
+
+```csv
+date,sales
+2022-01-01,1000
+2022-01-02,1100
+2022-01-03,950
+...
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deployment
 
-### Learn More
+### Deploy to Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Connect to Vercel**
+   ```bash
+   npx vercel
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Environment Variables**
+   - Set up your environment variables in the Vercel dashboard
+   - Include Supabase credentials and any API keys
 
-To learn more about Next.js, take a look at the following resources:
+3. **Deploy**
+   ```bash
+   vercel --prod
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The Python functions in `/api/` will automatically work on Vercel's infrastructure.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Development Notes
 
-### Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Local Development**: Uses a custom Python server for development since Vercel CLI has limited Python function support
+- **Production**: Python functions work natively on Vercel's serverless infrastructure
+- **Environment Detection**: Frontend automatically switches between local and production API endpoints
 
 
 ## MVP Overview
@@ -48,10 +120,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 The Minimum Viable Product (MVP) enables store managers to analyse actual and forecast data through a conversational AI. Managers upload data, view a 7-day forecast, and ask questions to gain insights, supporting better operational decisions like rostering.
 
 ### Core Features
-- Access a simple web portal for store-specific analysis.
-- Upload data to generate personalised predictions.
-- View a dashboard with 7-day forecasts.
-- Chat with an AI to explore data insights (limiting to ~5 questions).
+- Access a simple web portal for store-specific analysis
+- Upload data to generate personalised predictions with validation
+- View a dashboard with 7-day forecasts (current date aware)
+- Chat with an AI to explore data insights (limiting to ~5 questions)
 
 ### Stretch Goals
 - Support a scenario analysis with basic staffing insights.
