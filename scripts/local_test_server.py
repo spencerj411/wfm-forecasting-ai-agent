@@ -49,7 +49,7 @@ class LocalTestHandler(BaseHTTPRequestHandler):
                 from forecast import validate_and_prepare_data, fit_prophet_model, calculate_model_metrics, get_next_full_week
                 import pandas as pd
                 from io import StringIO
-                from datetime import timedelta
+                from datetime import datetime, timedelta
                 import numpy as np
                 
                 # Process the data directly

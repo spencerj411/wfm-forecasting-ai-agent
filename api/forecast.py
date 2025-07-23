@@ -6,7 +6,7 @@ from io import StringIO
 from http.server import BaseHTTPRequestHandler
 import traceback
 from datetime import datetime, timedelta
-from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error, mean_squared_error, r2_score
+# from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error, mean_squared_error, r2_score
 import logging
 
 # Set up logging for debugging
@@ -86,18 +86,29 @@ def fit_prophet_model(df):
         return model
 
 def calculate_model_metrics(model, train_df):
-    """Calculate model performance metrics"""
+    """Calculate model performance metrics without sklearn"""
     try:
         # Generate predictions for training data
         train_forecast = model.predict(train_df[['ds']])
         y_true = train_df['y'].values
         y_pred = train_forecast['yhat'].values
         
-        # Calculate metrics
+        # Calculate metrics manually
+        def mean_absolute_percentage_error(y_true, y_pred):
+            return np.mean(np.abs((y_true - y_pred) / y_true))
+        
+        def mean_absolute_error(y_true, y_pred):
+            return np.mean(np.abs(y_true - y_pred))
+        
+        def r2_score(y_true, y_pred):
+            ss_res = np.sum((y_true - y_pred) ** 2)
+            ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+            return 1 - (ss_res / ss_tot)
+        
         mape = mean_absolute_percentage_error(y_true, y_pred)
         bias = calculate_bias(y_true, y_pred)
         mae = mean_absolute_error(y_true, y_pred)
-        rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+        rmse = np.sqrt(np.mean((y_true - y_pred) ** 2))
         r2 = r2_score(y_true, y_pred)
         
         return {
@@ -108,7 +119,7 @@ def calculate_model_metrics(model, train_df):
             'r2': float(r2)
         }
     except Exception as e:
-        print(f"Warning: Could not calculate metrics: {e}")
+        logger.error(f"Warning: Could not calculate metrics: {e}")
         return None
 
 class handler(BaseHTTPRequestHandler):
