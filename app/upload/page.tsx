@@ -88,12 +88,10 @@ export default function UploadPage() {
       // Read file content
       const fileContent = await file.text()
       
-      // Call Prophet forecasting API (local development server)
-      const apiUrl = process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:8000/api/forecast' 
-        : '/api/forecast'
+      // Call Prophet forecasting API
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`${apiUrl}/forecast`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -14,10 +14,10 @@ An AI-powered demand forecasting application that helps store managers analyze s
 ## Tech Stack
 
 - **Frontend**: Next.js 15.2.4, React, TypeScript
-- **Backend**: Python serverless functions (Vercel)
+- **Backend**: Python Flask API (Railway)
 - **AI/ML**: Meta Prophet for time series forecasting
 - **Database**: Supabase for user data and forecasts
-- **Deployment**: Vercel
+- **Deployment**: Vercel (Frontend) + Railway (API)
 - **Styling**: Tailwind CSS
 
 ## Quick Start
@@ -50,14 +50,17 @@ An AI-powered demand forecasting application that helps store managers analyze s
 
 4. **Environment configuration**
    - Copy `.env.example` to `.env.local`
-   - Add your Supabase credentials and other environment variables
+   - Add your Supabase credentials and API URL:
+   ```bash
+   NEXT_PUBLIC_API_URL=http://localhost:8000
+   ```
 
 5. **Start the development servers**
 
    **Terminal 1 - Prophet API Server:**
    ```bash
    source venv/bin/activate
-   python scripts/local_test_server.py --port 8000
+   python main.py
    ```
 
    **Terminal 2 - Next.js Frontend:**
@@ -67,7 +70,7 @@ An AI-powered demand forecasting application that helps store managers analyze s
 
 6. **Access the application**
    - Frontend: http://localhost:3000
-   - Prophet API: http://localhost:8000/api/forecast
+   - Prophet API: http://localhost:8000/forecast
    - Health Check: http://localhost:8000/health
 
 ### How It Works
@@ -89,7 +92,7 @@ date,sales
 
 ## Deployment
 
-### Deploy to Vercel
+### Deploy Frontend to Vercel
 
 1. **Connect to Vercel**
    ```bash
@@ -98,20 +101,39 @@ date,sales
 
 2. **Environment Variables**
    - Set up your environment variables in the Vercel dashboard
-   - Include Supabase credentials and any API keys
+   - Include Supabase credentials and Railway API URL:
+   ```bash
+   NEXT_PUBLIC_API_URL=https://your-app-name.railway.app
+   ```
 
 3. **Deploy**
    ```bash
    vercel --prod
    ```
 
-The Python functions in `/api/` will automatically work on Vercel's infrastructure.
+### Deploy API to Railway
+
+1. **Connect GitHub to Railway**
+   - Go to [Railway](https://railway.app)
+   - Connect your GitHub repository
+   - Railway will auto-detect the Python app
+
+2. **Files Railway needs:**
+   - `main.py` - Flask application
+   - `requirements.txt` - Python dependencies
+   - `nixpacks.toml` - Start command configuration
+   - `.python-version` - Python version specification
+
+3. **Railway will automatically:**
+   - Install dependencies from `requirements.txt`
+   - Start the app with `gunicorn main:app`
+   - Provide a public URL for your API
 
 ## Development Notes
 
-- **Local Development**: Uses a custom Python server for development since Vercel CLI has limited Python function support
-- **Production**: Python functions work natively on Vercel's serverless infrastructure
-- **Environment Detection**: Frontend automatically switches between local and production API endpoints
+- **Local Development**: Run Flask API locally on port 8000, Next.js on port 3000
+- **Production**: Next.js on Vercel, Python API on Railway
+- **Environment Variables**: Use `NEXT_PUBLIC_API_URL` to switch between environments
 
 
 ## MVP Overview
