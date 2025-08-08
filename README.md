@@ -13,12 +13,92 @@ An AI-powered demand forecasting application that helps store managers analyze s
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15.2.4, React, TypeScript (`/frontend`)
+- **Frontend**: Next.js 15.2.4, React, TypeScript (`/web`)
 - **Backend**: Python Flask API (`/api`) deployed on Railway
-- **AI/ML**: Meta Prophet for time series forecasting
+- **AI/ML**: Meta Prophet for time series forecasting, OpenAI Agents SDK for multi-agent orchestration
 - **Database**: Supabase for user data and forecasts
-- **Deployment**: Vercel (Frontend) + Railway (API)
+- **Deployment**: Vercel (Frontend) + Railway (API + Forecasting Model)
 - **Styling**: Tailwind CSS
+
+## Architecture
+
+The system uses a multi-agent architecture built with OpenAI Agents SDK for intelligent workforce management decisions:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                            USER INTERFACE                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                 │
+│  │ Data Upload  │  │ Dashboard    │  │ Chat UI      │                 │
+│  │ (CSV Sales)  │  │ (Forecasts)  │  │ (Questions)  │                 │
+│  └──────────────┘  └──────────────┘  └──────────────┘                 │
+└─────────────────────────┬───────────────────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────────────────┐
+│                        API LAYER                                       │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                 │
+│  │ Upload API   │  │ Forecast API │  │ Chat API     │                 │
+│  └──────────────┘  └──────────────┘  └──────────────┘                 │
+└─────────────────────────┬───────────────────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────────────────┐
+│                      AGENT ORCHESTRATOR                                │
+│                    (Routes user queries)                               │
+└─────────────┬───────────────────────┬───────────────────────┬───────────┘
+              │                       │                       │
+┌─────────────▼───────────┐ ┌─────────▼───────────┐ ┌─────────▼───────────┐
+│    ANALYST AGENT        │ │ DATA SCIENTIST AGENT│ │  ROSTERING AGENT    │
+│        [MVP]            │ │    [POST-MVP]       │ │      [MVP]          │
+│                         │ │                     │ │                     │
+│ • Natural language      │ │ • Model optimization│ │ • Business rules    │
+│ • User communication    │ │ • Data quality      │ │ • Staff calculations│
+│ • Business insights     │ │ • Performance tuning│ │ • Shift generation  │
+│ • Query coordination    │ │ • Accuracy metrics  │ │ • Cost analysis     │
+└─────────────┬───────────┘ └─────────┬───────────┘ └─────────┬───────────┘
+              │                       │                       │
+              └───────────┬───────────┴───────────┬───────────┘
+                          │                       │
+                ┌─────────▼───────────────────────▼─────────┐
+                │         SHARED DATA LAYER                │
+                │  ┌─────────────┐  ┌─────────────────────┐ │
+                │  │ Sales Data  │  │ Forecast Results    │ │
+                │  │ (Historical)│  │ (7-day predictions) │ │
+                │  └─────────────┘  └─────────────────────┘ │
+                │  ┌─────────────┐  ┌─────────────────────┐ │
+                │  │ Staff Data  │  │ Business Rules      │ │
+                │  │ (Roster)    │  │ (Min staff, costs)  │ │
+                │  └─────────────┘  └─────────────────────┘ │
+                └─────────────────▲───────────────────────┘
+                                  │
+                ┌─────────────────▼───────────────────────┐
+                │         PROPHET ML MODEL               │
+                │                                        │
+                │ • Time series forecasting              │
+                │ • Seasonality detection                │
+                │ • Trend analysis                       │
+                │ • Confidence intervals                 │
+                │ • Model validation metrics             │
+                └────────────────────────────────────────┘
+```
+
+### Agent Responsibilities
+
+**MVP Agents:**
+- **Analyst Agent**: Primary user interface for natural language interactions, business insights, and query coordination
+- **Rostering Agent**: Handles staffing calculations, shift generation, business rules validation, and cost-benefit analysis
+
+**Post-MVP:**
+- **Data Scientist Agent**: Advanced model optimization, data quality assessment, and performance tuning
+
+### User Flow Example
+```
+User: "Should I add staff this Friday?"
+  ↓
+Analyst Agent: Coordinates query
+  ↓  
+Rostering Agent: "Friday shows 23% sales spike, add 1 staff = $120 cost, prevents $200 lost sales"
+  ↓
+Analyst Agent: "I recommend adding 1 staff Friday. Cost: $120, Benefit: $200"
+```
 
 ## Quick Start
 
@@ -46,7 +126,7 @@ An AI-powered demand forecasting application that helps store managers analyze s
    - Create environment file template
 
 3. **Configure environment**
-   - Edit `frontend/.env.local` with your Supabase credentials
+   - Edit `web/.env.local` with your Supabase credentials
    - API URL is already set to `http://localhost:8000`
 
 4. **Start development servers**
@@ -56,13 +136,13 @@ An AI-powered demand forecasting application that helps store managers analyze s
    ./scripts/start-api.sh
    ```
 
-   **Terminal 2 - Frontend Server:**
+   **Terminal 2 - Web Application:**
    ```bash
-   ./scripts/start-frontend.sh
+   ./scripts/start-web.sh
    ```
 
-6. **Access the application**
-   - Frontend: http://localhost:3000
+5. **Access the application**
+   - Web Application: http://localhost:3000
    - Prophet API: http://localhost:8000/forecast
    - Health Check: http://localhost:8000/health
 
