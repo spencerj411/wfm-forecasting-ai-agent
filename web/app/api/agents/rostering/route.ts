@@ -80,24 +80,22 @@ export async function POST(request: NextRequest) {
     
     // Log basic result info for debugging
     console.log('Rostering agent result type:', typeof result);
-    console.log('Has state:', !!(result as any)?.state);
-    console.log('Model responses count:', (result as any)?.state?._modelResponses?.length || 0);
+    console.log('Has state:', !!(result as unknown as Record<string, unknown>)?.state);
+    console.log('Model responses count:', ((result as unknown as Record<string, unknown>)?.state as Record<string, unknown>)?._modelResponses ? (((result as unknown as Record<string, unknown>).state as Record<string, unknown>)._modelResponses as unknown[]).length : 0);
     
     // Try different possible response formats
     if (typeof result === 'string') {
       responseText = result;
     } else if (result && typeof result === 'object') {
-      // Cast to any to access properties dynamically
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const resultAny = result as any;
+      const resultAny = result as unknown as Record<string, unknown>;
       
       // Handle OpenAI Agents SDK response structure
-      if (resultAny.state && resultAny.state._modelResponses) {
-        console.log('Found _modelResponses, count:', resultAny.state._modelResponses.length);
+      if (resultAny.state && (resultAny.state as Record<string, unknown>)._modelResponses) {
+        console.log('Found _modelResponses, count:', ((resultAny.state as Record<string, unknown>)._modelResponses as unknown[]).length);
         // Extract the last model response content
-        const modelResponses = resultAny.state._modelResponses;
+        const modelResponses = (resultAny.state as Record<string, unknown>)._modelResponses as unknown[];
         if (modelResponses.length > 0) {
-          const lastResponse = modelResponses[modelResponses.length - 1];
+          const lastResponse = modelResponses[modelResponses.length - 1] as Record<string, unknown>;
           console.log('Last response structure:', Object.keys(lastResponse));
           console.log('Last response output type:', typeof lastResponse.output);
           
@@ -106,12 +104,12 @@ export async function POST(request: NextRequest) {
             if (Array.isArray(lastResponse.output)) {
               console.log('Output is array with length:', lastResponse.output.length);
               // Find the message in the output array
-              const messageItem = lastResponse.output.find((item: any) => item.type === 'message');
+              const messageItem = lastResponse.output.find((item: Record<string, unknown>) => item.type === 'message');
               if (messageItem && messageItem.content) {
                 console.log('Found message item with content:', Array.isArray(messageItem.content));
                 if (Array.isArray(messageItem.content)) {
                   // Find the text content within the message content array
-                  const textItem = messageItem.content.find((c: any) => c.type === 'text');
+                  const textItem = messageItem.content.find((c: Record<string, unknown>) => c.type === 'text');
                   if (textItem && textItem.text) {
                     responseText = textItem.text;
                   } else {
@@ -133,7 +131,7 @@ export async function POST(request: NextRequest) {
           } else if (lastResponse.content) {
             // Fallback to content property
             if (Array.isArray(lastResponse.content)) {
-              const textContent = lastResponse.content.find((c: any) => c.type === 'text');
+              const textContent = lastResponse.content.find((c: Record<string, unknown>) => c.type === 'text');
               if (textContent && textContent.text) {
                 responseText = textContent.text;
               } else {
@@ -145,21 +143,14 @@ export async function POST(request: NextRequest) {
               responseText = JSON.stringify(lastResponse.content);
             }
           } else if (lastResponse.message) {
-            responseText = lastResponse.message.content || lastResponse.message;
+            responseText = String((lastResponse.message as Record<string, unknown>).content) || String(lastResponse.message);
           }
         }
       }
       
       // If we still don't have a response, try other fallbacks
       if (responseText === 'No response generated') {
-        responseText = resultAny.value ||
-                     resultAny.text || 
-                     resultAny.content || 
-                     resultAny.response || 
-                     resultAny.message ||
-                     (resultAny.choices && resultAny.choices[0]?.message?.content) ||
-                     (resultAny.messages && resultAny.messages[resultAny.messages.length - 1]?.content) ||
-                     (Array.isArray(resultAny) && resultAny[resultAny.length - 1]?.content) ||
+        responseText = String(resultAny.value || resultAny.text || resultAny.content || resultAny.response || resultAny.message) ||
                      `Debug: ${JSON.stringify(resultAny).substring(0, 200)}...`;
       }
     }

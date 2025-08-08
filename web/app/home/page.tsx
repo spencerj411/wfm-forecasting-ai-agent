@@ -98,7 +98,7 @@ export default function AuthenticatedHomePage() {
             <div className="mb-6 sm:mb-8 space-y-2 sm:space-y-3">
               <h3 className="text-xl sm:text-2xl lg:text-2xl xl:text-2xl font-bold text-gray-800">Dashboard Quick Peek</h3>
               <p className="text-sm sm:text-base lg:text-sm xl:text-base text-gray-600 max-w-2xl">
-                Once you upload data, you'll see your forecast insights here
+                Once you upload data, you&apos;ll see your forecast insights here
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
@@ -299,7 +299,7 @@ export default function AuthenticatedHomePage() {
             <div className="mb-6 sm:mb-8 space-y-2 sm:space-y-3">
               <h3 className="text-xl sm:text-2xl lg:text-2xl xl:text-2xl font-bold text-gray-800">Dashboard Quick Peek</h3>
               <p className="text-sm sm:text-base lg:text-sm xl:text-base text-gray-600 max-w-2xl">
-                Once you upload data, you'll see your forecast insights here
+                Once you upload data, you&apos;ll see your forecast insights here
               </p>
             </div>
             <div className="space-y-4">

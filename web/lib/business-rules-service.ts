@@ -3,7 +3,7 @@ import {
   RuleDocument, 
   BusinessRule, 
   RuleConflict,
-  ExtractedRules 
+  // ExtractedRules 
 } from './business-rules-types';
 
 /**
@@ -11,14 +11,14 @@ import {
  * Handles all database operations for business rules management
  */
 export class BusinessRulesService {
-  constructor(private supabase: SupabaseClient, private userId: string) {}
+  constructor(private _supabase: SupabaseClient, private _userId: string) {}
 
   // Document management
   async getDocuments(): Promise<RuleDocument[]> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this._supabase
       .from('rule_documents')
       .select('*')
-      .eq('user_id', this.userId)
+      .eq('user_id', this._userId)
       .order('uploaded_at', { ascending: false });
 
     if (error) throw error;
@@ -26,11 +26,11 @@ export class BusinessRulesService {
   }
 
   async getDocument(documentId: string): Promise<RuleDocument | null> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this._supabase
       .from('rule_documents')
       .select('*')
       .eq('id', documentId)
-      .eq('user_id', this.userId)
+      .eq('user_id', this._userId)
       .single();
 
     if (error) {
@@ -42,10 +42,10 @@ export class BusinessRulesService {
 
   // Business rules management
   async getRules(category?: string): Promise<BusinessRule[]> {
-    let query = this.supabase
+    let query = this._supabase
       .from('business_rules')
       .select('*')
-      .eq('user_id', this.userId)
+      .eq('user_id', this._userId)
       .eq('is_active', true);
 
     if (category) {
@@ -59,11 +59,11 @@ export class BusinessRulesService {
   }
 
   async getRule(ruleId: string): Promise<BusinessRule | null> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this._supabase
       .from('business_rules')
       .select('*')
       .eq('id', ruleId)
-      .eq('user_id', this.userId)
+      .eq('user_id', this._userId)
       .single();
 
     if (error) {
@@ -76,10 +76,10 @@ export class BusinessRulesService {
   async saveRules(rules: Omit<BusinessRule, 'id' | 'user_id' | 'created_at' | 'updated_at'>[]): Promise<BusinessRule[]> {
     const rulesWithUserId = rules.map(rule => ({
       ...rule,
-      user_id: this.userId
+      user_id: this._userId
     }));
 
-    const { data, error } = await this.supabase
+    const { data, error } = await this._supabase
       .from('business_rules')
       .insert(rulesWithUserId)
       .select();
@@ -89,14 +89,14 @@ export class BusinessRulesService {
   }
 
   async updateRule(ruleId: string, updates: Partial<BusinessRule>): Promise<BusinessRule> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this._supabase
       .from('business_rules')
       .update({
         ...updates,
         updated_at: new Date().toISOString()
       })
       .eq('id', ruleId)
-      .eq('user_id', this.userId)
+      .eq('user_id', this._userId)
       .select()
       .single();
 
@@ -105,28 +105,28 @@ export class BusinessRulesService {
   }
 
   async deactivateRule(ruleId: string): Promise<void> {
-    const { error } = await this.supabase
+    const { error } = await this._supabase
       .from('business_rules')
       .update({ 
         is_active: false,
         updated_at: new Date().toISOString()
       })
       .eq('id', ruleId)
-      .eq('user_id', this.userId);
+      .eq('user_id', this._userId);
 
     if (error) throw error;
   }
 
   // Conflict management
   async getUnresolvedConflicts(): Promise<RuleConflict[]> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this._supabase
       .from('rule_conflicts')
       .select(`
         *,
         rule_1:business_rules!rule_conflicts_rule_1_id_fkey(rule_name, category),
         rule_2:business_rules!rule_conflicts_rule_2_id_fkey(rule_name, category)
       `)
-      .eq('user_id', this.userId)
+      .eq('user_id', this._userId)
       .eq('resolution_status', 'unresolved')
       .order('detected_at', { ascending: false });
 
@@ -135,11 +135,11 @@ export class BusinessRulesService {
   }
 
   async createConflict(conflict: Omit<RuleConflict, 'id' | 'user_id' | 'detected_at'>): Promise<RuleConflict> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this._supabase
       .from('rule_conflicts')
       .insert({
         ...conflict,
-        user_id: this.userId
+        user_id: this._userId
       })
       .select()
       .single();
@@ -149,7 +149,7 @@ export class BusinessRulesService {
   }
 
   async resolveConflict(conflictId: string, resolution: string): Promise<void> {
-    const { error } = await this.supabase
+    const { error } = await this._supabase
       .from('rule_conflicts')
       .update({
         resolution_status: 'resolved',
@@ -157,7 +157,7 @@ export class BusinessRulesService {
         resolved_at: new Date().toISOString()
       })
       .eq('id', conflictId)
-      .eq('user_id', this.userId);
+      .eq('user_id', this._userId);
 
     if (error) throw error;
   }
@@ -166,13 +166,13 @@ export class BusinessRulesService {
   async trackRuleApplication(
     ruleId: string,
     context: string,
-    inputData?: Record<string, any>,
-    result?: Record<string, any>
+    inputData?: Record<string, unknown>,
+    result?: Record<string, unknown>
   ): Promise<void> {
-    const { error } = await this.supabase
+    const { error } = await this._supabase
       .from('rule_applications')
       .insert({
-        user_id: this.userId,
+        user_id: this._userId,
         rule_id: ruleId,
         application_context: context,
         input_data: inputData,
@@ -187,10 +187,10 @@ export class BusinessRulesService {
 
   // Utility methods
   async getRulesByType(ruleType: string): Promise<BusinessRule[]> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this._supabase
       .from('business_rules')
       .select('*')
-      .eq('user_id', this.userId)
+      .eq('user_id', this._userId)
       .eq('rule_type', ruleType)
       .eq('is_active', true);
 
@@ -199,10 +199,10 @@ export class BusinessRulesService {
   }
 
   async getRulesNeedingClarification(): Promise<BusinessRule[]> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this._supabase
       .from('business_rules')
       .select('*')
-      .eq('user_id', this.userId)
+      .eq('user_id', this._userId)
       .eq('needs_clarification', true)
       .eq('is_active', true)
       .order('created_at', { ascending: false });
@@ -213,10 +213,10 @@ export class BusinessRulesService {
 
   // Search and filter
   async searchRules(searchTerm: string): Promise<BusinessRule[]> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this._supabase
       .from('business_rules')
       .select('*')
-      .eq('user_id', this.userId)
+      .eq('user_id', this._userId)
       .eq('is_active', true)
       .or(`rule_name.ilike.%${searchTerm}%,rule_description.ilike.%${searchTerm}%`)
       .order('created_at', { ascending: false });

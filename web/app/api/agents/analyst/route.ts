@@ -1,6 +1,7 @@
 import { Agent, Runner, AgentInputItem } from '@openai/agents';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import type { User } from '@supabase/supabase-js';
 import { openai } from '@ai-sdk/openai';
 import { aisdk } from '@openai/agents-extensions';
 import { createGetSalesDataTool, createGetForecastDataTool, createCalculateStaffingTool, createGetBusinessRulesTool } from '../shared-tools';
@@ -10,7 +11,7 @@ import { z } from 'zod';
 // Store chat threads per user session
 const chatThreads = new Map<string, AgentInputItem[]>();
 
-const createCallRosteringAgentTool = (supabase: any, user: any) => {
+const createCallRosteringAgentTool = (supabase: ReturnType<typeof createClient>, user: { id: string; email?: string; app_metadata?: Record<string, unknown>; user_metadata?: Record<string, unknown>; aud?: string; created_at?: string }) => {
   return tool({
     name: 'consult_rostering_agent',
     description: 'Call the rostering agent to get business rules compliance and workforce planning advice. Use this for ANY business rules, staffing policies, or compliance-related questions.',
@@ -22,9 +23,10 @@ const createCallRosteringAgentTool = (supabase: any, user: any) => {
         console.log('🔄 CONSULTING ROSTERING AGENT for business rules:', query);
         
         // Create rostering agent tools directly with the same auth context
-        const getForecastDataTool = createGetForecastDataTool(supabase, user);
-        const calculateStaffingTool = createCalculateStaffingTool(supabase, user);
-        const getBusinessRulesTool = createGetBusinessRulesTool(supabase, user);
+        const resolvedSupabase = await supabase;
+        const getForecastDataTool = createGetForecastDataTool(resolvedSupabase, user as User);
+        const calculateStaffingTool = createCalculateStaffingTool(resolvedSupabase, user as User);
+        const getBusinessRulesTool = createGetBusinessRulesTool(resolvedSupabase, user as User);
         
         // Create rostering agent instance directly
         const model = aisdk(openai('gpt-4o'));
@@ -76,28 +78,28 @@ CRITICAL: Balance business rules compliance with financial optimization. If rule
         if (typeof result === 'string') {
           responseText = result;
         } else if (result && typeof result === 'object') {
-          const resultAny = result as any;
+          const resultAny = result as unknown as Record<string, unknown>;
           
           // Handle OpenAI Agents SDK response structure (same as main POST handler)
-          if (resultAny.state && resultAny.state._modelResponses) {
-            console.log('Found rostering agent _modelResponses, count:', resultAny.state._modelResponses.length);
-            const modelResponses = resultAny.state._modelResponses;
+          if (resultAny.state && (resultAny.state as Record<string, unknown>)._modelResponses) {
+            console.log('Found rostering agent _modelResponses, count:', ((resultAny.state as Record<string, unknown>)._modelResponses as unknown[]).length);
+            const modelResponses = (resultAny.state as Record<string, unknown>)._modelResponses as unknown[];
             if (modelResponses.length > 0) {
-              const lastResponse = modelResponses[modelResponses.length - 1];
+              const lastResponse = modelResponses[modelResponses.length - 1] as Record<string, unknown>;
               console.log('Rostering agent last response structure:', Object.keys(lastResponse));
               console.log('Rostering agent last response output type:', typeof lastResponse.output);
               
               // Try different content structures - OpenAI Agents SDK uses 'output' property
               if (lastResponse.output) {
                 if (Array.isArray(lastResponse.output)) {
-                  console.log('Rostering agent output is array with length:', lastResponse.output.length);
+                  console.log('Rostering agent output is array with length:', (lastResponse.output as unknown[]).length);
                   // Find the message in the output array
-                  const messageItem = lastResponse.output.find((item: any) => item.type === 'message');
+                  const messageItem = (lastResponse.output as unknown[]).find((item: unknown) => (item as Record<string, unknown>).type === 'message') as Record<string, unknown> | undefined;
                   if (messageItem && messageItem.content) {
                     console.log('Found rostering agent message item with content:', Array.isArray(messageItem.content));
                     if (Array.isArray(messageItem.content)) {
                       // Find the text content within the message content array
-                      const textItem = messageItem.content.find((c: any) => c.type === 'text');
+                      const textItem = messageItem.content.find((c: Record<string, unknown>) => c.type === 'text');
                       if (textItem && textItem.text) {
                         responseText = textItem.text;
                       } else {
@@ -119,7 +121,7 @@ CRITICAL: Balance business rules compliance with financial optimization. If rule
               } else if (lastResponse.content) {
                 // Fallback to content property
                 if (Array.isArray(lastResponse.content)) {
-                  const textContent = lastResponse.content.find((c: any) => c.type === 'text');
+                  const textContent = lastResponse.content.find((c: Record<string, unknown>) => c.type === 'text');
                   if (textContent && textContent.text) {
                     responseText = textContent.text;
                   } else {
@@ -131,21 +133,14 @@ CRITICAL: Balance business rules compliance with financial optimization. If rule
                   responseText = JSON.stringify(lastResponse.content);
                 }
               } else if (lastResponse.message) {
-                responseText = lastResponse.message.content || lastResponse.message;
+                responseText = String((lastResponse.message as Record<string, unknown>).content) || String(lastResponse.message);
               }
             }
           }
           
           // If we still don't have a response, try other fallbacks
           if (responseText === 'No response generated from rostering agent') {
-            responseText = resultAny.value ||
-                         resultAny.text || 
-                         resultAny.content || 
-                         resultAny.response || 
-                         resultAny.message ||
-                         (resultAny.choices && resultAny.choices[0]?.message?.content) ||
-                         (resultAny.messages && resultAny.messages[resultAny.messages.length - 1]?.content) ||
-                         (Array.isArray(resultAny) && resultAny[resultAny.length - 1]?.content) ||
+            responseText = String(resultAny.value || resultAny.text || resultAny.content || resultAny.response || resultAny.message) ||
                          `Debug rostering agent result: ${JSON.stringify(resultAny).substring(0, 200)}...`;
           }
         }
@@ -190,9 +185,10 @@ export async function POST(request: NextRequest) {
     const thread = chatThreads.get(userSessionId)!;
 
     // Create shared tools - rostering agent handles all business rules
-    const getSalesDataTool = createGetSalesDataTool(supabase, user);
-    const getForecastDataTool = createGetForecastDataTool(supabase, user);
-    const callRosteringAgentTool = createCallRosteringAgentTool(supabase, user);
+    const resolvedSupabase = await supabase;
+    const getSalesDataTool = createGetSalesDataTool(resolvedSupabase, user as User);
+    const getForecastDataTool = createGetForecastDataTool(resolvedSupabase, user as User);
+    const callRosteringAgentTool = createCallRosteringAgentTool(Promise.resolve(resolvedSupabase), user);
 
     // Create model and agent
     console.log('OpenAI API key configured:', !!process.env.OPENAI_API_KEY);
@@ -305,7 +301,7 @@ Your role is to:
     // Create runner and execute
     console.log('Creating runner with model...');
     
-    let result: any;
+    let result: unknown;
     // Define tool-to-agent mapping for generic collaboration detection
     const toolToAgentMap: Record<string, string> = {
       'get_sales_data': 'analyst',
@@ -325,35 +321,41 @@ Your role is to:
       console.log('Agent execution completed, result keys:', Object.keys(result || {}));
       
       // Check which tools were called (for generic collaboration detection)
-      if (result && (result as any).state && (result as any).state._modelResponses) {
-        const responses = (result as any).state._modelResponses;
+      if (result && (result as Record<string, unknown>).state && ((result as Record<string, unknown>).state as Record<string, unknown>)._modelResponses) {
+        const responses = ((result as Record<string, unknown>).state as Record<string, unknown>)._modelResponses as unknown[];
         console.log('🔍 Number of model responses:', responses.length);
         
-        responses.forEach((response: any, index: number) => {
-          if (response.output && Array.isArray(response.output)) {
-            console.log(`🔍 Response ${index} output items:`, response.output.map((item: any) => ({
-              type: item.type,
-              name: item.name || 'no-name',
-              keys: Object.keys(item)
-            })));
+        responses.forEach((response: unknown, index: number) => {
+          const responseObj = response as Record<string, unknown>;
+          if (responseObj.output && Array.isArray(responseObj.output)) {
+            console.log(`🔍 Response ${index} output items:`, (responseObj.output as unknown[]).map((item: unknown) => {
+              const itemObj = item as Record<string, unknown>;
+              return {
+                type: itemObj.type,
+                name: itemObj.name || 'no-name',
+                keys: Object.keys(itemObj)
+              };
+            }));
             
-            const toolCalls = response.output.filter((item: any) => item.type === 'tool_use');
-            const messages = response.output.filter((item: any) => item.type === 'message');
+            const toolCalls = (responseObj.output as unknown[]).filter((item: unknown) => (item as Record<string, unknown>).type === 'tool_use');
+            const messages = (responseObj.output as unknown[]).filter((item: unknown) => (item as Record<string, unknown>).type === 'message');
             console.log(`Response ${index}: ${toolCalls.length} tool calls, ${messages.length} messages`);
             
             // Check all items for tool calls, regardless of type
-            response.output.forEach((item: any) => {
-              const toolName = item.name || (item.function && item.function.name);
+            (responseObj.output as unknown[]).forEach((item: unknown) => {
+              const itemObj = item as Record<string, unknown>;
+              const toolName = itemObj.name || (itemObj.function && (itemObj.function as Record<string, unknown>).name);
               if (toolName) {
-                toolsUsed.add(toolName);
+                toolsUsed.add(String(toolName));
                 console.log(`🔧 Found tool call: ${toolName}`);
               }
             });
             
-            toolCalls.forEach((tool: any) => {
-              console.log(`🔧 Tool called: ${tool.name} with params:`, tool.input);
-              if (tool.name) {
-                toolsUsed.add(tool.name);
+            toolCalls.forEach((tool: unknown) => {
+              const toolObj = tool as Record<string, unknown>;
+              console.log(`🔧 Tool called: ${toolObj.name} with params:`, toolObj.input);
+              if (toolObj.name) {
+                toolsUsed.add(toolObj.name as string);
               }
             });
           }
@@ -363,8 +365,8 @@ Your role is to:
       console.log('🔍 All tools used:', Array.from(toolsUsed));
       
       // Update the chat thread with the conversation history
-      if (result && (result as any).history) {
-        chatThreads.set(userSessionId, (result as any).history);
+      if (result && (result as Record<string, unknown>).history) {
+        chatThreads.set(userSessionId, (result as Record<string, unknown>).history as AgentInputItem[]);
       } else {
         // Fallback - add user message to thread
         chatThreads.set(userSessionId, newThread);
@@ -383,24 +385,22 @@ Your role is to:
     
     // Log basic result info for debugging
     console.log('Agent result type:', typeof result);
-    console.log('Has state:', !!(result as any)?.state);
-    console.log('Model responses count:', (result as any)?.state?._modelResponses?.length || 0);
+    console.log('Has state:', !!(result as Record<string, unknown>)?.state);
+    console.log('Model responses count:', ((result as Record<string, unknown>)?.state as Record<string, unknown>)?._modelResponses ? (((result as Record<string, unknown>).state as Record<string, unknown>)._modelResponses as unknown[]).length : 0);
     
     // Try different possible response formats
     if (typeof result === 'string') {
       responseText = result;
     } else if (result && typeof result === 'object') {
-      // Cast to any to access properties dynamically
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const resultAny = result as any;
+      const resultAny = result as Record<string, unknown>;
       
       // Handle OpenAI Agents SDK response structure
-      if (resultAny.state && resultAny.state._modelResponses) {
-        console.log('Found _modelResponses, count:', resultAny.state._modelResponses.length);
+      if (resultAny.state && (resultAny.state as Record<string, unknown>)._modelResponses) {
+        console.log('Found _modelResponses, count:', ((resultAny.state as Record<string, unknown>)._modelResponses as unknown[]).length);
         // Extract the last model response content
-        const modelResponses = resultAny.state._modelResponses;
+        const modelResponses = (resultAny.state as Record<string, unknown>)._modelResponses as unknown[];
         if (modelResponses.length > 0) {
-          const lastResponse = modelResponses[modelResponses.length - 1];
+          const lastResponse = modelResponses[modelResponses.length - 1] as Record<string, unknown>;
           console.log('Last response structure:', Object.keys(lastResponse));
           console.log('Last response output type:', typeof lastResponse.output);
           
@@ -409,12 +409,12 @@ Your role is to:
             if (Array.isArray(lastResponse.output)) {
               console.log('Output is array with length:', lastResponse.output.length);
               // Find the message in the output array
-              const messageItem = lastResponse.output.find((item: any) => item.type === 'message');
+              const messageItem = lastResponse.output.find((item: Record<string, unknown>) => item.type === 'message');
               if (messageItem && messageItem.content) {
                 console.log('Found message item with content:', Array.isArray(messageItem.content));
                 if (Array.isArray(messageItem.content)) {
                   // Find the text content within the message content array
-                  const textItem = messageItem.content.find((c: any) => c.type === 'text');
+                  const textItem = messageItem.content.find((c: Record<string, unknown>) => c.type === 'text');
                   if (textItem && textItem.text) {
                     responseText = textItem.text;
                   } else {
@@ -436,7 +436,7 @@ Your role is to:
           } else if (lastResponse.content) {
             // Fallback to content property
             if (Array.isArray(lastResponse.content)) {
-              const textContent = lastResponse.content.find((c: any) => c.type === 'text');
+              const textContent = lastResponse.content.find((c: Record<string, unknown>) => c.type === 'text');
               if (textContent && textContent.text) {
                 responseText = textContent.text;
               } else {
@@ -448,21 +448,14 @@ Your role is to:
               responseText = JSON.stringify(lastResponse.content);
             }
           } else if (lastResponse.message) {
-            responseText = lastResponse.message.content || lastResponse.message;
+            responseText = String((lastResponse.message as Record<string, unknown>).content) || String(lastResponse.message);
           }
         }
       }
       
       // If we still don't have a response, try other fallbacks
       if (responseText === 'No response generated') {
-        responseText = resultAny.value ||
-                     resultAny.text || 
-                     resultAny.content || 
-                     resultAny.response || 
-                     resultAny.message ||
-                     (resultAny.choices && resultAny.choices[0]?.message?.content) ||
-                     (resultAny.messages && resultAny.messages[resultAny.messages.length - 1]?.content) ||
-                     (Array.isArray(resultAny) && resultAny[resultAny.length - 1]?.content) ||
+        responseText = String(resultAny.value || resultAny.text || resultAny.content || resultAny.response || resultAny.message) ||
                      `Debug: ${JSON.stringify(resultAny).substring(0, 200)}...`;
       }
     }

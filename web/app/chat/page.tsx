@@ -118,7 +118,7 @@ const AgentIndicator = ({ message }: { message: Message }) => {
         {consultedAgents.length > 0 && (
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-xs text-gray-500 font-medium whitespace-nowrap">Consulted:</span>
-            {consultedAgents.map((agent, index) => {
+            {consultedAgents.map((agent) => {
               const config = getAgentConfig(agent.agentId)
               const colors = getAgentColors(agent.agentId)
               const IconComponent = config ? getAgentIcon(config.icon) : Brain
@@ -218,7 +218,7 @@ export default function ChatPage() {
   }, [])
 
   // Chat history persistence functions
-  const getChatHistoryKey = () => `chat_history_${user?.id}`
+  const getChatHistoryKey = useCallback(() => `chat_history_${user?.id}`, [user?.id])
   
   const saveChatHistory = useCallback((messagesToSave: Message[]) => {
     if (!user) return
@@ -232,7 +232,7 @@ export default function ChatPage() {
     } catch (error) {
       console.error('Failed to save chat history:', error)
     }
-  }, [user, sessionId])
+  }, [user, sessionId, getChatHistoryKey])
 
   const loadChatHistory = useCallback(() => {
     if (!user) return null
@@ -242,9 +242,9 @@ export default function ChatPage() {
         const historyData = JSON.parse(saved)
         // Convert timestamp strings back to Date objects
         if (historyData.messages) {
-          historyData.messages = historyData.messages.map((msg: any) => ({
+          historyData.messages = historyData.messages.map((msg: Record<string, unknown>) => ({
             ...msg,
-            timestamp: new Date(msg.timestamp)
+            timestamp: new Date(msg.timestamp as string)
           }))
         }
         return historyData
@@ -253,7 +253,7 @@ export default function ChatPage() {
       console.error('Failed to load chat history:', error)
     }
     return null
-  }, [user])
+  }, [user, getChatHistoryKey])
 
   const clearChatHistory = useCallback(() => {
     if (!user) return
@@ -262,7 +262,7 @@ export default function ChatPage() {
     } catch (error) {
       console.error('Failed to clear chat history:', error)
     }
-  }, [user])
+  }, [getChatHistoryKey, user])
 
   // Load chat history on component mount
   useEffect(() => {
@@ -496,7 +496,7 @@ export default function ChatPage() {
                         .replace(/\*(.*?)\*/g, '<em>$1</em>')
                         .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:text-blue-800 underline transition-colors">$1</a>')
                         .replace(/^• (.*$)/gim, '<li>$1</li>')
-                        .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+                        .replace(/(<li>.*<\/li>)/gm, '<ul>$1</ul>')
                         .replace(/\n/g, '<br>')
                     }}
                   />
@@ -539,7 +539,7 @@ export default function ChatPage() {
                         .replace(/\*(.*?)\*/g, '<em>$1</em>')
                         .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:text-blue-800 underline transition-colors">$1</a>')
                         .replace(/^• (.*$)/gim, '<li>$1</li>')
-                        .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+                        .replace(/(<li>.*<\/li>)/gm, '<ul>$1</ul>')
                         .replace(/\n/g, '<br>')
                     }}
                   />

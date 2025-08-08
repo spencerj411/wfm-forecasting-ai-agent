@@ -6,14 +6,14 @@ import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface DocumentUploadProps {
-  onUploadComplete?: (document: any) => void
+  onUploadComplete?: (document: Record<string, unknown>) => void
   onError?: (error: string) => void
   className?: string
 }
 
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error'
 
-export function DocumentUpload({ onUploadComplete, onError, className }: DocumentUploadProps) {
+export function DocumentUpload({ onUploadComplete: _onUploadComplete, onError: _onError, className }: DocumentUploadProps) {
   const [status, setStatus] = useState<UploadStatus>('idle')
   const [progress, setProgress] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
@@ -81,7 +81,7 @@ export function DocumentUpload({ onUploadComplete, onError, className }: Documen
       }
 
       // Notify parent component
-      onUploadComplete?.(result.document)
+      _onUploadComplete?.(result.document)
 
       // Reset after delay
       setTimeout(() => {
@@ -95,7 +95,7 @@ export function DocumentUpload({ onUploadComplete, onError, className }: Documen
       setErrorMessage(message)
       setStatus('error')
       setProgress(0)
-      onError?.(message)
+      _onError?.(message)
     }
   }
 

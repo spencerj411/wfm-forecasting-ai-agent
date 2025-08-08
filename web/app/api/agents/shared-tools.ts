@@ -2,7 +2,8 @@ import { tool } from '@openai/agents';
 import { z } from 'zod';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { User } from '@supabase/supabase-js';
-import { createBusinessRulesService } from '@/lib/business-rules-service';
+import { createClient } from '@/utils/supabase/server';
+// import { createBusinessRulesService } from '@/lib/business-rules-service';
 
 export const createGetSalesDataTool = (supabase: SupabaseClient, user: User) => {
   return tool({
@@ -92,7 +93,7 @@ export const createGetForecastDataTool = (supabase: SupabaseClient, user: User) 
   });
 };
 
-export const createCalculateStaffingTool = (supabase: SupabaseClient, user: User) => {
+export const createCalculateStaffingTool = (_supabase: SupabaseClient, _user: User) => {
   return tool({
     name: 'calculate_staffing',
     description: 'Calculate optimal staffing based on forecasted sales with detailed financial impact analysis',

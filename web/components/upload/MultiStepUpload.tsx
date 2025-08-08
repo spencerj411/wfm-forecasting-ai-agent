@@ -18,7 +18,7 @@ type Step = 'sales-data' | 'business-rules' | 'generate-forecast'
 interface StepData {
   salesFile?: File
   businessRulesFile?: File
-  businessRulesDocuments?: any[]
+  businessRulesDocuments?: Array<Record<string, unknown>>
   isComplete: boolean
 }
 
@@ -80,7 +80,8 @@ export function MultiStepUpload() {
   }, [currentStep])
 
   // Handle sales data upload
-  const handleSalesFileSelect = (file: File) => {
+  const handleSalesFileSelect = (file: File | null) => {
+    if (!file) return
     setStepData(prev => ({
       ...prev,
       'sales-data': {
@@ -176,8 +177,8 @@ export function MultiStepUpload() {
       const csvContent = await stepData['sales-data'].salesFile!.text()
       await saveHistoricalSalesData(csvContent)
       
-      // Generate forecast via Python API
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/forecast`, {
+      // Generate forecast via Next.js API route
+      const response = await fetch('/api/forecast', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -214,7 +215,7 @@ export function MultiStepUpload() {
       console.log('First few forecast items:', result.forecast.slice(0, 3))
       
       // Filter out empty objects and validate data
-      const validForecastItems = result.forecast.filter((item: any, index: number) => {
+      const validForecastItems = result.forecast.filter((item: Record<string, unknown>, index: number) => {
         if (!item || typeof item !== 'object') {
           console.warn(`Skipping invalid item at index ${index}:`, item)
           return false
@@ -244,10 +245,10 @@ export function MultiStepUpload() {
       }
       
       // Extract forecast data with proper error handling
-      const forecastData = validForecastItems.map((item: any) => ({
+      const forecastData = validForecastItems.map((item: Record<string, unknown>) => ({
         date: item.date,
-        forecast: Math.round(Math.max(0, item.forecast)),
-        confidence: Math.round(Math.max(10, Math.min(95, item.confidence || 75)))
+        forecast: Math.round(Math.max(0, Number(item.forecast))),
+        confidence: Math.round(Math.max(10, Math.min(95, Number(item.confidence) || 75)))
       }))
       
       console.log('Processed forecast data:', forecastData.slice(0, 3))
@@ -263,7 +264,7 @@ export function MultiStepUpload() {
         setDataSummary(result.data_summary)
       }
       
-      const hasBusinessRules = stepData['business-rules'].businessRulesDocuments?.length > 0
+      const hasBusinessRules = (stepData['business-rules'].businessRulesDocuments?.length || 0) > 0
       const rulesText = hasBusinessRules 
         ? ` Your business rules have been integrated for compliant staffing recommendations.`
         : ''
@@ -606,7 +607,7 @@ export function MultiStepUpload() {
                 <p><strong>Requirements:</strong></p>
                 <ul className="list-disc list-inside space-y-1 ml-4">
                   <li>CSV format with headers</li>
-                  <li>Must contain "date" and "sales" columns</li>
+                  <li>Must contain &quot;date&quot; and &quot;sales&quot; columns</li>
                   <li>At least 30 days of data recommended</li>
                   <li>Sales values should be positive numbers</li>
                 </ul>
@@ -665,10 +666,10 @@ export function MultiStepUpload() {
                       <li key={index} className="text-sm text-green-700 flex items-center">
                         <CheckCircle className="w-4 h-4 mr-2" />
                         <div>
-                          <div>{doc.filename}</div>
+                          <div>{String(doc.filename)}</div>
                           <div className="text-xs text-green-600">
-                            🤖 AI identified as: {doc.document_type.replace('_', ' ')}
-                            {doc.ai_classification && ` (${Math.round(doc.ai_classification.confidence * 100)}% confidence)`}
+                            🤖 AI identified as: {String(doc.document_type).replace('_', ' ')}
+                            {doc.ai_classification ? ` (${Math.round((doc.ai_classification as Record<string, unknown>).confidence as number * 100)}% confidence)` : ''}
                           </div>
                         </div>
                       </li>
@@ -719,7 +720,7 @@ export function MultiStepUpload() {
                   {stepData['business-rules'].businessRulesDocuments && stepData['business-rules'].businessRulesDocuments.length > 0 ? (
                     <div className="flex items-center justify-center">
                       <CheckCircle className="w-5 h-5 mr-2 text-green-600" />
-                      <span>{stepData['business-rules'].businessRulesDocuments.length} business rule document(s) processed</span>
+                      <span>{stepData['business-rules'].businessRulesDocuments?.length || 0} business rule document(s) processed</span>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center">

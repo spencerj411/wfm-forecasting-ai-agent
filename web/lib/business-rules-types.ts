@@ -92,7 +92,7 @@ export interface ComplianceRule {
     minimum_age?: number
     restricted_hours?: string[]
   }
-  union_requirements?: Record<string, any>
+  union_requirements?: Record<string, unknown>
 }
 
 export interface RuleConflict {
@@ -113,8 +113,8 @@ export interface RuleApplication {
   user_id: string
   rule_id: string
   application_context: string
-  input_data?: Record<string, any>
-  rule_result?: Record<string, any>
+  input_data?: Record<string, unknown>
+  rule_result?: Record<string, unknown>
   applied_at?: string
 }
 

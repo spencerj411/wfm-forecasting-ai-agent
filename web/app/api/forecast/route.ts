@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
     const headers = lines[0].toLowerCase().split(',').map((h: string) => h.trim())
     
     // Find date and sales columns
-    const dateIndex = headers.findIndex(h => h.includes('date') || h.includes('time'))
-    const salesIndex = headers.findIndex(h => h.includes('sales') || h.includes('revenue'))
+    const dateIndex = headers.findIndex((h: string) => h.includes('date') || h.includes('time'))
+    const salesIndex = headers.findIndex((h: string) => h.includes('sales') || h.includes('revenue'))
     
     if (dateIndex === -1 || salesIndex === -1) {
       return NextResponse.json({ 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createBusinessRulesService } from '@/lib/business-rules-service';
-import { BusinessRule, ExtractedRules } from '@/lib/business-rules-types';
+// import { BusinessRule, ExtractedRules } from '@/lib/business-rules-types';
 
 // Placeholder for document analysis - will be implemented after upload flow works
 

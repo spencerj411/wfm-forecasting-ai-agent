@@ -9,7 +9,7 @@ import { useEffect } from 'react'
 export default function BusinessRulesPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const [uploadedDocuments, setUploadedDocuments] = useState<any[]>([])
+  const [uploadedDocuments, setUploadedDocuments] = useState<Array<Record<string, unknown>>>([])
 
   useEffect(() => {
     if (!loading && !user) {
@@ -21,7 +21,7 @@ export default function BusinessRulesPage() {
     return null
   }
 
-  const handleUploadComplete = (document: any) => {
+  const handleUploadComplete = (document: Record<string, unknown>) => {
     console.log('Document uploaded:', document)
     setUploadedDocuments(prev => [...prev, document])
   }
@@ -70,12 +70,12 @@ export default function BusinessRulesPage() {
                   <div key={index} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-medium text-gray-900">{doc.filename}</h3>
+                        <h3 className="font-medium text-gray-900">{String(doc.filename)}</h3>
                         <p className="text-sm text-gray-500 capitalize">
-                          {doc.document_type.replace('_', ' ')}
+                          {String(doc.document_type).replace('_', ' ')}
                         </p>
                         <p className="text-xs text-gray-400 mt-1">
-                          {doc.text_length} characters extracted
+                          {String(doc.text_length)} characters extracted
                         </p>
                       </div>
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -102,10 +102,10 @@ export default function BusinessRulesPage() {
             <div className="space-y-2 text-sm text-blue-700">
               <p><strong>Try asking:</strong></p>
               <ul className="list-disc list-inside space-y-1 ml-4">
-                <li>"What are my overtime rules?"</li>
-                <li>"How many staff do I need for tomorrow?"</li>
-                <li>"What are my break requirements?"</li>
-                <li>"Are there any conflicts in my policies?"</li>
+                <li>&quot;What are my overtime rules?&quot;</li>
+                <li>&quot;How many staff do I need for tomorrow?&quot;</li>
+                <li>&quot;What are my break requirements?&quot;</li>
+                <li>&quot;Are there any conflicts in my policies?&quot;</li>
               </ul>
             </div>
             <div className="mt-4">

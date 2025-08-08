@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mounted = false
       listener?.subscription.unsubscribe()
     }
-  }, [])
+  }, [supabase.auth])
 
   const logout = async () => {
     // Clear chat history on logout
