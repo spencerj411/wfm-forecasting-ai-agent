@@ -16,17 +16,19 @@ pip install -r api/requirements.txt
 
 # Install Node.js dependencies
 echo "📦 Installing Node.js dependencies..."
-cd frontend
+cd web
 pnpm install
 cd ..
 
 # Copy environment file if it doesn't exist
-if [ ! -f "frontend/.env.local" ]; then
+if [ ! -f "web/.env.local" ]; then
     echo "⚙️ Creating environment file..."
-    cp frontend/.env.example frontend/.env.local
-    echo "✅ Created frontend/.env.local - please update with your credentials"
+    cp web/.env.example web/.env.local
+    echo "✅ Created web/.env.local - please update with your credentials"
 fi
 
-echo "🎉 Setup complete! You can now run:"
-echo "  ./scripts/start-api.sh     (in Terminal 1)"
-echo "  ./scripts/start-frontend.sh (in Terminal 2)"
+echo "🎉 Setup complete!"
+echo ""
+echo "To start the application, run these commands in separate terminals:"
+echo "  Terminal 1: ./scripts/start-api.sh"
+echo "  Terminal 2: ./scripts/start-web.sh"

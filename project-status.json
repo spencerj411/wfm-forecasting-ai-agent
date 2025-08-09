@@ -2,6 +2,17 @@
   "project": "WFM Demand Forecasting AI Agent",
   "last_updated": "2025-07-23",
   "current_phase": "MVP Development",
+
+  "agents_architecture": {
+    "data_scientist_agent": {
+      "purpose": "Ensure the forecasting model is as accurate as possible",
+      "responsibilities": ["Prophet model optimization", "Data quality assessment", "Model validation", "Performance tuning", "Accuracy metrics monitoring"]
+    },
+    "analyst_agent": {
+      "purpose": "Communicate with data scientist agent to help users understand their data for business decisions",
+      "responsibilities": ["Natural language interface", "Business insights translation", "Query data scientist agent", "Decision support", "User-friendly explanations"]
+    }
+  },
   
   "completed": [
     {
@@ -30,13 +41,24 @@
 
   "next_up": [
     {
-      "feature": "Conversational AI Chat",
+      "feature": "Analyst Agent (Conversational AI Chat)",
       "priority": "high",
-      "tasks": ["Chat interface", "AI integration", "Forecast data querying", "Conversation history", "Question limiting (~5-6)"]
+      "mvp": true,
+      "tasks": ["Chat interface", "Analyst agent integration", "Communication layer with data scientist agent", "Forecast data querying", "Conversation history", "Question limiting (~5-6)", "Handle all core questions from README"]
     },
+    {
+      "feature": "Data Scientist Agent",
+      "priority": "high", 
+      "mvp": false,
+      "tasks": ["Prophet model optimization", "Data quality assessment", "Model validation", "Performance tuning", "Accuracy metrics monitoring", "Communication interface for analyst agent"]
+    }
+  ],
+
+  "backlog": [
     {
       "feature": "Dashboard & Table Improvements",
       "priority": "medium",
+      "mvp": false,
       "tasks": [
         "Add clickable metrics modal/section (MAPE, R², MAE, RMSE, bias)",
         "Enhance forecast table with more info (day of week, trend indicators, seasonal notes)",
@@ -44,13 +66,11 @@
         "Add 2-week forecast option toggle",
         "Change 'Total Forecast Revenue' text to neutral color (remove green)"
       ]
-    }
-  ],
-
-  "backlog": [
+    },
     {
       "feature": "Advanced Forecasting Model",
       "priority": "medium", 
+      "mvp": false,
       "tasks": [
         "Incremental data uploads (append new data vs replace)",
         "Update upload UI to support append/replace modes with data conflict resolution",
@@ -65,18 +85,9 @@
       ]
     },
     {
-      "feature": "Background Processing",
-      "priority": "low",
-      "tasks": [
-        "Background forecast processing (allow user to leave page)",
-        "Job queue system for long-running forecasts", 
-        "Real-time progress updates and notifications",
-        "Polling mechanism for forecast status"
-      ]
-    },
-    {
       "feature": "Enhanced Loading UX",
       "priority": "medium",
+      "mvp": false,
       "tasks": [
         "Progressive loading messages (data validation → model training → forecasting → finalizing)",
         "Time estimates for forecast processing based on data size",
@@ -87,8 +98,20 @@
       ]
     },
     {
+      "feature": "Background Processing",
+      "priority": "low",
+      "mvp": false,
+      "tasks": [
+        "Background forecast processing (allow user to leave page)",
+        "Job queue system for long-running forecasts", 
+        "Real-time progress updates and notifications",
+        "Polling mechanism for forecast status"
+      ]
+    },
+    {
       "feature": "WFM Suggestions (Stretch)",
       "priority": "low",
+      "mvp": false,
       "tasks": ["Roster file upload", "Staffing recommendations", "Scenario analysis", "Approval workflow"]
     }
   ],
@@ -97,7 +120,8 @@
     "web_portal": "✅ Complete",
     "data_upload": "✅ Complete", 
     "forecast_dashboard": "✅ Complete",
-    "ai_chat": "🚧 Next priority",
+    "analyst_agent": "🚧 Next priority (MVP critical)",
+    "data_scientist_agent": "📋 Post-MVP (next after analyst)",
     "wfm_suggestions": "📋 Stretch goal"
   }
 }

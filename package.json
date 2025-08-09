@@ -1,0 +1,17 @@
+{
+  "name": "wfm-forecasting-ai-agent",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "dev:full": "echo 'Run in separate terminals:' && echo '1. pnpm dev (for web)' && echo '2. cd api && python main.py (for API)'",
+    "build": "pnpm --filter web build",
+    "install:all": "pnpm install",
+    "web": "pnpm --filter web",
+    "api": "cd api && python main.py"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "packageManager": "pnpm@9.0.0"
+}
