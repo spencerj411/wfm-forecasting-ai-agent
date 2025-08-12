@@ -54,15 +54,21 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Generate simple forecast (7 days ahead starting from tomorrow)
+    // Generate forecast for next calendar week (Monday-Sunday) for rostering purposes
     // This is a placeholder - in production you'd use a proper ML model
     const avgSales = salesData.reduce((sum, item) => sum + item.sales, 0) / salesData.length
     const today = new Date()
     
+    // Find the next Monday (start of next calendar week)
+    const nextMonday = new Date(today)
+    const daysUntilNextMonday = (7 - today.getDay() + 1) % 7 || 7 // 0 = Sunday, 1 = Monday, etc.
+    nextMonday.setDate(today.getDate() + daysUntilNextMonday)
+    
     const forecast = []
-    for (let i = 1; i <= 7; i++) {
-      const forecastDate = new Date(today)
-      forecastDate.setDate(today.getDate() + i)
+    // Generate forecasts for Monday through Sunday of next week
+    for (let i = 0; i < 7; i++) {
+      const forecastDate = new Date(nextMonday)
+      forecastDate.setDate(nextMonday.getDate() + i)
       
       // Simple forecast with some randomness (±20% of average)
       const variation = 0.8 + (Math.random() * 0.4) // 0.8 to 1.2 multiplier
