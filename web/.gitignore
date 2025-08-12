@@ -77,7 +77,9 @@ dist
 
 # Gatsby files
 .cache/
-public
+public/
+# Exception: Include sample CSV file
+!public/sample-sales-data.csv
 
 # Storybook build outputs
 .out
